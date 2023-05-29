@@ -23,7 +23,16 @@ jobs:
 
       - name: Install dependencies
         run: npm install
-
+        
+      - name: Make envfile
+        uses: SpicyPizza/create-envfile@v1.3
+        with:
+          PORT: 3000
+          MONGODB_URI: ${{ secrets.MONGODB_URI }}
+          MONGODB_TEST_URI: ${{ secrets.MONGODB_TEST_URI }}
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
+          CLAVE_SECRETA_DE_STRIPE_TEST: ${{ secrets.CLAVE_SECRETA_DE_STRIPE_TEST }}
+          
       - name: Run tests with coverage
         run: npm test -- --coverage
 
