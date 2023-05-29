@@ -1,0 +1,985 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+      "title": "API ASTOUR",
+      "version": "1.0.0",
+      "description": "API para recibir dar recursos a la aplicación movil y web"
+    },
+    "servers": [
+      {
+        "url": "http://localhost:3000",
+        "description": "Development server"
+      }
+    ],
+    "paths": {
+      "/api/login": {
+        "post": {
+          "summary": "Iniciar sesión",
+          "description": "Permite iniciar sesión a un usuario existente.",
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LoginRequest"
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "description": "Token JWT generado al autenticar al usuario.",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/LoginResponse"
+                  }
+                }
+              }
+            },
+            "401": {
+              "description": "Credenciales incorrectas.",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/ErrorResponse"
+                  }
+                }
+              }
+            },
+            "500": {
+              "description": "Error interno del servidor.",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/ErrorResponse"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/api/register": {
+        "post": {
+          "summary": "Registrar nuevo usuario.",
+          "description": "Permite registrar a un usuario si no existia ya en el sistema.",
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RegisterRequest"
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "description": "Usuario registrado correctamente.",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/SuccessResponse"
+                  }
+                }
+              }
+            },
+            "400": {
+              "description": "El email ya está registrado.",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/ErrorResponse"
+                  }
+                }
+              }
+            },
+            "500": {
+              "description": "Ha habido un error en el servidor.",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/ErrorResponse"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/api/edit/user": {
+        "put": {
+          "summary": "Actualiza los datos del usuario.",
+          "description": "Actualiza los datos del usuario en la base de datos o sistema de almacenamiento.",
+          "security": [
+            {
+              "bearerAuth": []
+            }
+          ],
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EditUserRequest"
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "description": "Usuario actualizado con éxito.",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/SuccessResponse"
+                  }
+                }
+              }
+            },
+            "400": {
+              "description": "Datos inválidos."
+            },
+            "401": {
+              "description": "No autorizado."
+            },
+            "404": {
+              "description": "Usuario no encontrado."
+            },
+            "500": {
+              "description": "Error interno del servidor.",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/ErrorResponse"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/api/admin/activity": {
+        "post": {
+          "summary": "Registrar nueva actividad",
+          "description": "Permite registrar una nueva actividad en el sistema.",
+          "security": [
+            {
+              "bearerAuth": []
+            }
+          ],
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ActivityRequest"
+                }
+              }
+            }
+          },
+          "responses": {
+            "201": {
+              "description": "Actividad registrada correctamente.",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/SuccessResponse"
+                  }
+                }
+              }
+            },
+            "400": {
+              "description": "Datos inválidos."
+            },
+            "500": {
+              "description": "Error interno del servidor.",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/ErrorResponse"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "get": {
+          "summary": "Obtener lista de actividades",
+          "description": "Obtiene la lista de todas las actividades registradas en el sistema.",
+          "responses": {
+            "200": {
+              "description": "Lista de actividades.",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/ActivityListResponse"
+                  }
+                }
+              }
+            },
+            "500": {
+              "description": "Error interno del servidor.",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/ErrorResponse"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/api/admin/activity/{id}": {
+        "put": {
+          "summary": "Actualizar actividad",
+          "description": "Actualiza la información de una actividad existente.",
+          "security": [
+            {
+              "bearerAuth": []
+            }
+          ],
+          "parameters": [
+            {
+              "name": "id",
+              "in": "path",
+              "description": "ID de la actividad.",
+              "required": true,
+              "schema": {
+                "type": "string"
+              }
+            }
+          ],
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ActivityRequest"
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "description": "Actividad actualizada correctamente.",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/SuccessResponse"
+                  }
+                }
+              }
+            },
+            "400": {
+              "description": "Datos inválidos."
+            },
+            "404": {
+              "description": "Actividad no encontrada."
+            },
+            "500": {
+              "description": "Error interno del servidor.",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/ErrorResponse"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "delete": {
+          "summary": "Eliminar actividad",
+          "description": "Elimina una actividad existente del sistema.",
+          "security": [
+            {
+              "bearerAuth": []
+            }
+          ],
+          "parameters": [
+            {
+              "name": "id",
+              "in": "path",
+              "description": "ID de la actividad.",
+              "required": true,
+              "schema": {
+                "type": "string"
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Actividad eliminada correctamente.",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/SuccessResponse"
+                  }
+                }
+              }
+            },
+            "404": {
+              "description": "Actividad no encontrada."
+            },
+            "500": {
+              "description": "Error interno del servidor.",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/ErrorResponse"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/api/admin/activity/{id}/events": {
+        "post": {
+          "summary": "Crear evento",
+          "description": "Crea un nuevo evento para una actividad específica.",
+          "security": [
+            {
+              "bearerAuth": []
+            }
+          ],
+          "parameters": [
+            {
+              "name": "id",
+              "in": "path",
+              "description": "ID de la actividad.",
+              "required": true,
+              "schema": {
+                "type": "string"
+              }
+            }
+          ],
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EventRequest"
+                }
+              }
+            }
+          },
+          "responses": {
+            "201": {
+              "description": "Evento creado correctamente.",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/SuccessResponse"
+                  }
+                }
+              }
+            },
+            "400": {
+              "description": "Datos inválidos."
+            },
+            "404": {
+              "description": "Actividad no encontrada."
+            },
+            "500": {
+              "description": "Error interno del servidor.",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/ErrorResponse"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/api/admin/activity/{activityId}/events/{eventId}": {
+        "put": {
+          "summary": "Actualizar evento",
+          "description": "Actualiza la información de un evento existente.",
+          "security": [
+            {
+              "bearerAuth": []
+            }
+          ],
+          "parameters": [
+            {
+              "name": "activityId",
+              "in": "path",
+              "description": "ID de la actividad.",
+              "required": true,
+              "schema": {
+                "type": "string"
+              }
+            },
+            {
+              "name": "eventId",
+              "in": "path",
+              "description": "ID del evento.",
+              "required": true,
+              "schema": {
+                "type": "string"
+              }
+            }
+          ],
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EventRequest"
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "description": "Evento actualizado correctamente.",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/SuccessResponse"
+                  }
+                }
+              }
+            },
+            "400": {
+              "description": "Datos inválidos."
+            },
+            "404": {
+              "description": "Actividad o evento no encontrados."
+            },
+            "500": {
+              "description": "Error interno del servidor.",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/ErrorResponse"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "delete": {
+          "summary": "Eliminar evento",
+          "description": "Elimina un evento existente de una actividad.",
+          "security": [
+            {
+              "bearerAuth": []
+            }
+          ],
+          "parameters": [
+            {
+              "name": "activityId",
+              "in": "path",
+              "description": "ID de la actividad.",
+              "required": true,
+              "schema": {
+                "type": "string"
+              }
+            },
+            {
+              "name": "eventId",
+              "in": "path",
+              "description": "ID del evento.",
+              "required": true,
+              "schema": {
+                "type": "string"
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Evento eliminado correctamente.",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/SuccessResponse"
+                  }
+                }
+              }
+            },
+            "404": {
+              "description": "Actividad o evento no encontrados."
+            },
+            "500": {
+              "description": "Error interno del servidor.",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/ErrorResponse"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/api/admin/activity/{activityId}/events/{eventId}/book": {
+        "post": {
+          "summary": "Reservar evento",
+          "description": "Reserva un evento para un usuario.",
+          "security": [
+            {
+              "bearerAuth": []
+            }
+          ],
+          "parameters": [
+            {
+              "name": "activityId",
+              "in": "path",
+              "description": "ID de la actividad.",
+              "required": true,
+              "schema": {
+                "type": "string"
+              }
+            },
+            {
+              "name": "eventId",
+              "in": "path",
+              "description": "ID del evento.",
+              "required": true,
+              "schema": {
+                "type": "string"
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Evento reservado correctamente.",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/SuccessResponse"
+                  }
+                }
+              }
+            },
+            "400": {
+              "description": "Datos inválidos o evento completo."
+            },
+            "404": {
+              "description": "Actividad o evento no encontrados."
+            },
+            "500": {
+              "description": "Error interno del servidor.",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/ErrorResponse"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/api/admin/activity/{activityId}/events/{eventId}/cancel": {
+        "put": {
+          "summary": "Cancelar evento",
+          "description": "Cancela un evento existente.",
+          "security": [
+            {
+              "bearerAuth": []
+            }
+          ],
+          "parameters": [
+            {
+              "name": "activityId",
+              "in": "path",
+              "description": "ID de la actividad.",
+              "required": true,
+              "schema": {
+                "type": "string"
+              }
+            },
+            {
+              "name": "eventId",
+              "in": "path",
+              "description": "ID del evento.",
+              "required": true,
+              "schema": {
+                "type": "string"
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Evento cancelado correctamente.",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/SuccessResponse"
+                  }
+                }
+              }
+            },
+            "404": {
+              "description": "Actividad o evento no encontrados."
+            },
+            "500": {
+              "description": "Error interno del servidor.",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/ErrorResponse"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/api/admin/activity/{activityId}/events/{eventId}/updateSeats": {
+        "put": {
+          "summary": "Actualizar asientos",
+          "description": "Actualiza la cantidad de asientos disponibles para un evento.",
+          "security": [
+            {
+              "bearerAuth": []
+            }
+          ],
+          "parameters": [
+            {
+              "name": "activityId",
+              "in": "path",
+              "description": "ID de la actividad.",
+              "required": true,
+              "schema": {
+                "type": "string"
+              }
+            },
+            {
+              "name": "eventId",
+              "in": "path",
+              "description": "ID del evento.",
+              "required": true,
+              "schema": {
+                "type": "string"
+              }
+            }
+          ],
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UpdateSeatsRequest"
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "description": "Asientos actualizados correctamente.",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/SuccessResponse"
+                  }
+                }
+              }
+            },
+            "400": {
+              "description": "Datos inválidos o asientos insuficientes."
+            },
+            "404": {
+              "description": "Actividad o evento no encontrados."
+            },
+            "500": {
+              "description": "Error interno del servidor.",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/ErrorResponse"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "components": {
+      "schemas": {
+        "LoginRequest": {
+          "type": "object",
+          "properties": {
+            "email": {
+              "type": "string",
+              "description": "Email del usuario.",
+              "example": "usuario@dominio.com"
+            },
+            "password": {
+              "type": "string",
+              "description": "Contraseña del usuario.",
+              "example": "contraseña123"
+            }
+          },
+          "required": ["email", "password"]
+        },
+        "LoginResponse": {
+          "type": "object",
+          "properties": {
+            "token": {
+              "type": "string",
+              "description": "Token JWT generado al autenticar al usuario."
+            }
+          }
+        },
+        "RegisterRequest": {
+          "type": "object",
+          "properties": {
+            "name": {
+              "type": "string",
+              "description": "Nombre del usuario.",
+              "example": "John Doe"
+            },
+            "email": {
+              "type": "string",
+              "description": "Email del usuario.",
+              "example": "usuario@dominio.com"
+            },
+            "birthday": {
+              "type": "string",
+              "format": "date",
+              "description": "Fecha de nacimiento del usuario en formato YYYY-MM-DD.",
+              "example": "1990-01-01"
+            },
+            "telephone": {
+              "type": "number",
+              "description": "Teléfono del usuario."
+            },
+            "country": {
+              "type": "string",
+              "description": "País del usuario."
+            },
+            "password": {
+              "type": "string",
+              "description": "Contraseña del usuario."
+            }
+          },
+          "required": ["name", "email", "password"]
+        },
+        "EditUserRequest": {
+          "type": "object",
+          "properties": {
+            "name": {
+              "type": "string",
+              "description": "Nombre del usuario.",
+              "example": "John Doe"
+            },
+            "birthday": {
+              "type": "string",
+              "format": "date",
+              "description": "Fecha de nacimiento del usuario en formato YYYY-MM-DD.",
+              "example": "1990-01-01"
+            },
+            "telephone": {
+              "type": "number",
+              "description": "Teléfono del usuario."
+            },
+            "country": {
+              "type": "string",
+              "description": "País del usuario."
+            }
+          }
+        },
+        "SuccessResponse": {
+          "type": "object",
+          "properties": {
+            "message": {
+              "type": "string",
+              "description": "Mensaje de éxito."
+            }
+          }
+        },
+        "ErrorResponse": {
+          "type": "object",
+          "properties": {
+            "message": {
+              "type": "string",
+              "description": "Mensaje de error."
+            }
+          }
+        },
+        "ActivityRequest": {
+          "type": "object",
+          "properties": {
+            "name": {
+              "type": "string",
+              "description": "Nombre de la actividad.",
+              "example": "Actividad 1"
+            },
+            "description": {
+              "type": "string",
+              "description": "Descripción de la actividad."
+            },
+            "location": {
+              "type": "string",
+              "description": "Ubicación de la actividad."
+            },
+            "duration": {
+              "type": "number",
+              "description": "Duración de la actividad en minutos."
+            },
+            "accesibility": {
+              "type": "string",
+              "description": "Accesibilidad de la actividad."
+            },
+            "petsPermited": {
+              "type": "boolean",
+              "description": "Indica si se permiten mascotas en la actividad."
+            },
+            "state": {
+              "type": "string",
+              "enum": ["abierta", "parada temporalmente", "cancelada"],
+              "description": "Estado de la actividad."
+            }
+          },
+          "required": ["name", "description", "location", "duration", "accesibility", "petsPermited", "state"]
+        },
+        "ActivityListResponse": {
+          "type": "object",
+          "properties": {
+            "activities": {
+              "type": "array",
+              "items": {
+                "$ref": "#/components/schemas/Activity"
+              },
+              "description": "Lista de actividades."
+            }
+          }
+        },
+        "Activity": {
+          "type": "object",
+          "properties": {
+            "name": {
+              "type": "string",
+              "description": "Nombre de la actividad."
+            },
+            "description": {
+              "type": "string",
+              "description": "Descripción de la actividad."
+            },
+            "location": {
+              "type": "string",
+              "description": "Ubicación de la actividad."
+            },
+            "duration": {
+              "type": "number",
+              "description": "Duración de la actividad en minutos."
+            },
+            "accesibility": {
+              "type": "string",
+              "description": "Accesibilidad de la actividad."
+            },
+            "petsPermited": {
+              "type": "boolean",
+              "description": "Indica si se permiten mascotas en la actividad."
+            },
+            "state": {
+              "type": "string",
+              "enum": ["abierta", "parada temporalmente", "cancelada"],
+              "description": "Estado de la actividad."
+            },
+            "events": {
+              "type": "array",
+              "items": {
+                "$ref": "#/components/schemas/Event"
+              },
+              "description": "Eventos asociados a la actividad."
+            }
+          }
+        },
+        "EventRequest": {
+          "type": "object",
+          "properties": {
+            "seats": {
+              "type": "number",
+              "description": "Número de asientos disponibles."
+            },
+            "bookedSeats": {
+              "type": "number",
+              "description": "Número de asientos reservados."
+            },
+            "date": {
+              "type": "string",
+              "format": "date-time",
+              "description": "Fecha y hora del evento en formato ISO 8601."
+            },
+            "price": {
+              "type": "number",
+              "description": "Precio del evento."
+            },
+            "language": {
+              "type": "string",
+              "description": "Idioma del evento."
+            },
+            "guide": {
+              "type": "string",
+              "description": "Guía del evento."
+            }
+          },
+          "required": ["seats", "bookedSeats", "date", "price", "guide"]
+        },
+        "Event": {
+          "type": "object",
+          "properties": {
+            "seats": {
+              "type": "number",
+              "description": "Número de asientos disponibles."
+            },
+            "bookedSeats": {
+              "type": "number",
+              "description": "Número de asientos reservados."
+            },
+            "date": {
+              "type": "string",
+              "format": "date-time",
+              "description": "Fecha y hora del evento en formato ISO 8601."
+            },
+            "price": {
+              "type": "number",
+              "description": "Precio del evento."
+            },
+            "language": {
+              "type": "string",
+              "description": "Idioma del evento."
+            },
+            "guide": {
+              "type": "string",
+              "description": "Guía del evento."
+            }
+          }
+        },
+        "UpdateSeatsRequest": {
+          "type": "object",
+          "properties": {
+            "seats": {
+              "type": "number",
+              "description": "Número de asientos disponibles."
+            },
+            "bookedSeats": {
+              "type": "number",
+              "description": "Número de asientos reservados."
+            }
+          },
+          "required": ["seats", "bookedSeats"]
+        }
+      },
+      "securitySchemes": {
+        "bearerAuth": {
+          "type": "http",
+          "scheme": "bearer",
+          "bearerFormat": "JWT"
+        }
+      }
+    }
+  }
+  
