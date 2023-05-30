@@ -5,7 +5,7 @@ const request = require('supertest');
 const { signToken } = require("../src/services/tokenService")
 
 import { DecodedToken } from 'src/models/DecodedToken';
-import User, { Role } from '../src/models/user';
+import User, { Role, UserDoc } from '../src/models/user';
 const app = require('../src/app');
 
 describe('Admin Users API', () => {
@@ -30,12 +30,13 @@ describe('Admin Users API', () => {
     });
 
     beforeEach(async () => {
-        await User.deleteMany({});
+
         token = signToken({ userId: "1", isAdmin: true })
     });
 
     describe('POST /api/admin/register', () => {
-        beforeEach(() => {
+        beforeEach(async () => {
+            await User.deleteMany({});
             jest.resetAllMocks();
         });
         it('should register a new user', async () => {
@@ -159,26 +160,25 @@ describe('Admin Users API', () => {
 
 
     describe('GET /api/admin/users', () => {
-        beforeEach(() => {
+        let existingUser1, existingUser2: UserDoc;
+        beforeEach(async () => {
+            await User.deleteMany({});
             jest.resetAllMocks();
-        });
-        it('should return a list of users', async () => {
-            const existingUser1 = new User({
+            existingUser1 = await new User({
                 name: 'User 1',
                 email: 'user1@example.com',
                 password: 'password123',
                 role: Role.administrador,
-            });
-            await existingUser1.save();
+            }).save();
 
-            const existingUser2 = new User({
+            existingUser2 = await new User({
                 name: 'User 2',
                 email: 'user2@example.com',
                 password: 'password123',
                 role: Role.administrador,
-            });
-            await existingUser2.save();
-
+            }).save();
+        });
+        it('should return a list of users', async () => {
             const response = await request(app)
                 .get('/api/admin/users')
                 .set('Authorization', `Bearer ${token}`);
@@ -189,22 +189,6 @@ describe('Admin Users API', () => {
             expect(response.body[1].name).toBe('User 2');
         });
         it('should return a filtred list of users', async () => {
-            const existingUser1 = new User({
-                name: 'User 1',
-                email: 'user1@example.com',
-                password: 'password123',
-                role: Role.administrador,
-            });
-            await existingUser1.save();
-
-            const existingUser2 = new User({
-                name: 'User 2',
-                email: 'user2@example.com',
-                password: 'password123',
-                role: Role.administrador,
-            });
-            await existingUser2.save();
-
             const response = await request(app)
                 .get('/api/admin/users?searchString=2')
                 .set('Authorization', `Bearer ${token}`);
@@ -214,22 +198,6 @@ describe('Admin Users API', () => {
             expect(response.body[0].name).toBe('User 2');
         });
         it('should return 401 when a non-logged in user tries to get a list of users', async () => {
-            const existingUser1 = new User({
-                name: 'User 1',
-                email: 'user1@example.com',
-                password: 'password123',
-                role: Role.administrador,
-            });
-            await existingUser1.save();
-
-            const existingUser2 = new User({
-                name: 'User 2',
-                email: 'user2@example.com',
-                password: 'password123',
-                role: Role.administrador,
-            });
-            await existingUser2.save();
-
             const response = await request(app)
                 .get('/api/admin/users')
 
@@ -250,22 +218,6 @@ describe('Admin Users API', () => {
                 throw new Error('Server error');
             });
 
-            const existingUser1 = new User({
-                name: 'User 1',
-                email: 'user1@example.com',
-                password: 'password123',
-                role: Role.administrador,
-            });
-            await existingUser1.save();
-
-            const existingUser2 = new User({
-                name: 'User 2',
-                email: 'user2@example.com',
-                password: 'password123',
-                role: Role.administrador,
-            });
-            await existingUser2.save();
-
             const response = await request(app)
                 .get('/api/admin/users')
                 .set('Authorization', `Bearer ${token}`);
@@ -276,18 +228,18 @@ describe('Admin Users API', () => {
     });
 
     describe('GET /api/admin/user', () => {
-        beforeEach(() => {
+        let existingUser1: UserDoc;
+        beforeEach(async () => {
+            await User.deleteMany({});
             jest.resetAllMocks();
-        });
-        it('should return a user', async () => {
-            const existingUser1 = new User({
+            existingUser1 = await new User({
                 name: 'User 1',
                 email: 'user1@example.com',
                 password: 'password123',
                 role: Role.administrador,
-            });
-            await existingUser1.save();
-
+            }).save();
+        });
+        it('should return a user', async () => {
             const response = await request(app)
                 .get(`/api/admin/user?email=${existingUser1.email}`)
                 .set('Authorization', `Bearer ${token}`);
@@ -296,14 +248,6 @@ describe('Admin Users API', () => {
             expect(response.body.name).toBe('User 1');
         });
         it('should return 401 when a non-logged in user tries to get a user data', async () => {
-            const existingUser1 = new User({
-                name: 'User 1',
-                email: 'user1@example.com',
-                password: 'password123',
-                role: Role.administrador,
-            });
-            await existingUser1.save();
-
             const response = await request(app)
                 .get(`/api/admin/user?email=${existingUser1.email}`)
 
@@ -311,14 +255,6 @@ describe('Admin Users API', () => {
             expect(response.body.message).toBe('Usuario debe registrarse');
         });
         it('should retur 403 when a user without admin role tries to get a user data', async () => {
-            const existingUser1 = new User({
-                name: 'User 1',
-                email: 'user1@example.com',
-                password: 'password123',
-                role: Role.administrador,
-            });
-            await existingUser1.save();
-
             const token = signToken({ userId: "1", isAdmin: false })
             const response = await request(app)
                 .get(`/api/admin/user?email=${existingUser1.email}`)
@@ -331,14 +267,6 @@ describe('Admin Users API', () => {
             jest.spyOn(User, 'findOne').mockImplementation(() => {
                 throw new Error('Server error');
             });
-
-            const existingUser1 = new User({
-                name: 'User 1',
-                email: 'user1@example.com',
-                password: 'password123',
-                role: Role.administrador,
-            });
-            await existingUser1.save();
 
             const response = await request(app)
                 .get(`/api/admin/user?email=${existingUser1.email}`)
@@ -400,18 +328,18 @@ describe('Admin Users API', () => {
     // });
 
     describe('DELETE /api/admin/user', () => {
-        beforeEach(() => {
+        let existingUser: UserDoc;
+        beforeEach(async () => {
+            await User.deleteMany({});
             jest.resetAllMocks();
-        });
-        it('should delete the user with the given id', async () => {
-            const existingUser = new User({
+            existingUser = await new User({
                 name: 'Existing User',
                 email: 'existinguser@example.com',
                 password: 'password123',
                 role: Role.administrador,
-            });
-            const userdb = await existingUser.save();
-
+            }).save();
+        });
+        it('should delete the user with the given id', async () => {
             const response = await request(app)
                 .delete(`/api/admin/user?email=${existingUser.email}`)
                 .set('Authorization', `Bearer ${token}`)
@@ -419,25 +347,17 @@ describe('Admin Users API', () => {
             expect(response.status).toBe(200);
             expect(response.body.message).toBe('Usuario eliminado correctamente.');
 
-            const deletedUser = await User.findById(userdb._id);
+            const deletedUser = await User.findById(existingUser._id);
             expect(deletedUser).toBeNull();
         });
         it('should return 401 when a non-logged in user tries to delete a user', async () => {
-            const existingUser = new User({
-                name: 'Existing User',
-                email: 'existinguser@example.com',
-                password: 'password123',
-                role: Role.administrador,
-            });
-            const userdb = await existingUser.save();
-
             const response = await request(app)
                 .delete(`/api/admin/user?email=${existingUser.email}`)
 
             expect(response.status).toBe(401);
             expect(response.body.message).toBe('Usuario debe registrarse');
 
-            const notDeletedUser = await User.findById(userdb._id);
+            const notDeletedUser = await User.findById(existingUser._id);
             expect(notDeletedUser).toBeDefined();
             expect(notDeletedUser.email).toBe(existingUser.email)
         });
@@ -461,17 +381,8 @@ describe('Admin Users API', () => {
             jest.spyOn(User, 'findOneAndRemove').mockImplementation(() => {
                 throw new Error('Server error');
             });
-
-            const existingUser1 = new User({
-                name: 'User 1',
-                email: 'user1@example.com',
-                password: 'password123',
-                role: Role.administrador,
-            });
-            await existingUser1.save();
-
             const response = await request(app)
-                .delete(`/api/admin/user?email=${existingUser1.email}`)
+                .delete(`/api/admin/user?email=${existingUser.email}`)
                 .set('Authorization', `Bearer ${token}`);
 
             expect(response.status).toBe(500);
