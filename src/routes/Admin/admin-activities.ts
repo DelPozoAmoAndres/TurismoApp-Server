@@ -1,6 +1,7 @@
 import Activity from '../../models/activity';
 import express, { Request, Response } from 'express';
 import Event, { EventDoc } from '../../models/event';
+import User, { Role } from '../../models/user';
 const { adminCheck } = require('../../services/tokenService');
 const mongoose = require('mongoose');
 
@@ -23,7 +24,7 @@ router.post('/activity', async (req, res) => {
             }
         } catch (error) {
             console.error(error);
-            res.status(500).json({ message: 'Error al añadir la actividad' });
+            res.status(500).json({ message: 'Ha habido un error en el servidor.' });
         }
     });
 });
@@ -46,7 +47,7 @@ router.put('/activity', async (req, res) => {
 
         } catch (error) {
             console.error(error);
-            res.status(500).json({ message: 'Error al modificar la actividad' });
+            res.status(500).json({ message: 'Ha habido un error en el servidor.' });
         }
     });
 });
@@ -67,7 +68,7 @@ router.delete('/activity/:id', async (req, res) => {
             }
         } catch (error) {
             console.error(error);
-            res.status(500).json({ message: 'Error al eliminar la actividad' });
+            res.status(500).json({ message: 'Ha habido un error en el servidor.' });
         }
     });
 });
@@ -79,12 +80,23 @@ router.post('/event', async (req: Request, res: Response) => {
 
             const actividad = await Activity.findById(req.body.activityId);
 
+            if (!actividad) {
+                res.status(404).json({ message: "Actividad no encontrada" })
+                return;
+            }
+
             const { language, price, seats, guide, date } = req.body.event
             const repeatInfo = req.body.repeatInfo;
 
             let events: EventDoc[] = actividad.events ? actividad.events : [];
 
-            if (repeatInfo.repeatType == "days") {
+            const user = await User.find({ role: Role.guía, _id: guide });
+            if (!(user?.length >0)) {
+                res.status(404).json({ message: "Guía no encontrado" })
+                return;
+            }
+
+            if (repeatInfo?.repeatType == "days") {
                 const days: string[] = repeatInfo.repeatDays
                 const time = repeatInfo.time.split(":")
                 days.forEach((day) => {
@@ -93,7 +105,7 @@ router.post('/event', async (req: Request, res: Response) => {
                     events.push(new Event({ bookedSeats: 0, date, language, price, seats, guide }))
                 })
             }
-            else if (repeatInfo.repeatType == "range") {
+            else if (repeatInfo?.repeatType == "range") {
                 const currDate = new Date(repeatInfo.repeatStartDate);
                 const lastDate = new Date(repeatInfo.repeatEndDate);
                 const time = repeatInfo.time.split(":")
