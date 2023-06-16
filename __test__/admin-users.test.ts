@@ -241,7 +241,7 @@ describe('Admin Users API', () => {
         });
         it('should return a user', async () => {
             const response = await request(app)
-                .get(`/api/admin/user?email=${existingUser1.email}`)
+                .get(`/api/admin/user?id=${existingUser1._id}`)
                 .set('Authorization', `Bearer ${token}`);
 
             expect(response.status).toBe(200);
@@ -249,7 +249,7 @@ describe('Admin Users API', () => {
         });
         it('should return 401 when a non-logged in user tries to get a user data', async () => {
             const response = await request(app)
-                .get(`/api/admin/user?email=${existingUser1.email}`)
+                .get(`/api/admin/user?id=${existingUser1._id}`)
 
             expect(response.status).toBe(401);
             expect(response.body.message).toBe('Usuario debe registrarse');
@@ -257,7 +257,7 @@ describe('Admin Users API', () => {
         it('should retur 403 when a user without admin role tries to get a user data', async () => {
             const token = signToken({ userId: "1", isAdmin: false })
             const response = await request(app)
-                .get(`/api/admin/user?email=${existingUser1.email}`)
+                .get(`/api/admin/user?id=${existingUser1._id}`)
                 .set('Authorization', `Bearer ${token}`);
 
             expect(response.status).toBe(403);
@@ -269,7 +269,7 @@ describe('Admin Users API', () => {
             });
 
             const response = await request(app)
-                .get(`/api/admin/user?email=${existingUser1.email}`)
+                .get(`/api/admin/user?id=${existingUser1._id}`)
                 .set('Authorization', `Bearer ${token}`);
 
             expect(response.status).toBe(500);
@@ -341,7 +341,7 @@ describe('Admin Users API', () => {
         });
         it('should delete the user with the given id', async () => {
             const response = await request(app)
-                .delete(`/api/admin/user?email=${existingUser.email}`)
+                .delete(`/api/admin/user?id=${existingUser._id}`)
                 .set('Authorization', `Bearer ${token}`)
 
             expect(response.status).toBe(200);
@@ -352,7 +352,7 @@ describe('Admin Users API', () => {
         });
         it('should return 401 when a non-logged in user tries to delete a user', async () => {
             const response = await request(app)
-                .delete(`/api/admin/user?email=${existingUser.email}`)
+                .delete(`/api/admin/user?id=${existingUser._id}`)
 
             expect(response.status).toBe(401);
             expect(response.body.message).toBe('Usuario debe registrarse');
@@ -364,14 +364,14 @@ describe('Admin Users API', () => {
         it('should return 403 when a user without admin role tries to delete a user', async () => {
             const token = signToken({ userId: "1", isAdmin: false })
             const response = await request(app)
-                .delete('/api/admin/user?email=nonexistentuser')
+                .delete('/api/admin/user?id=nonexistentuser')
                 .set('Authorization', `Bearer ${token}`);
             expect(response.status).toBe(403);
             expect(response.body.message).toBe('No tienes permisos para hacer esto');
         });
         it('should return 404 when trying to delete a non-existent user', async () => {
             const response = await request(app)
-                .delete('/api/admin/user?email=nonexistentuser')
+                .delete('/api/admin/user?id=nonexistentuser')
                 .set('Authorization', `Bearer ${token}`);
 
             expect(response.status).toBe(404);
@@ -382,7 +382,7 @@ describe('Admin Users API', () => {
                 throw new Error('Server error');
             });
             const response = await request(app)
-                .delete(`/api/admin/user?email=${existingUser.email}`)
+                .delete(`/api/admin/user?id=${existingUser._id}`)
                 .set('Authorization', `Bearer ${token}`);
 
             expect(response.status).toBe(500);

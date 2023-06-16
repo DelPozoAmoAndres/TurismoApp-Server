@@ -10,14 +10,17 @@ const path = require('path');
 
 import users from './routes/users';
 import activities from './routes/activities';
+import reservations from './routes/reservations';
 import adminUsers from './routes/Admin/admin-users';
 import adminActivities from './routes/Admin/admin-activities';
 import payments from './routes/payments';
-import stripe from './routes/stripe';
 
 const app = express();
 
-// Middleware
+import { loggerMiddleware } from './utils/logger';
+
+// Middlewar
+app.use(loggerMiddleware);
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cors());
@@ -32,8 +35,8 @@ app.use('/api', users);
 app.use('/api/admin', adminUsers);
 app.use('/api/admin', adminActivities);
 app.use('/api', activities);
-// app.use('/api', payments);
-// app.use('/api', stripe);
+app.use('/api', payments);
+app.use('/api', reservations);
 
 
 module.exports = app;

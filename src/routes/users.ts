@@ -3,7 +3,7 @@ import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
 
 import User, { Role } from '../models/user';
-const { getUserId } = require('../services/tokenService');
+const { getUserId, createToken } = require('../services/tokenService');
 
 const router = express.Router();
 
@@ -26,9 +26,7 @@ router.post('/login', async (req: Request, res: Response) => {
         }
 
         // Si las credenciales son correctas, se genera el token JWT y se devuelve en la respuesta
-        const token = jwt.sign({ userId: user.id, isAdmin: user.role === Role.administrador }, process.env.JWT_SECRET, {
-            expiresIn: '1h'
-        });
+        const token = createToken(user);
 
         res.status(200).json({ token, user });
     } catch (error) {
@@ -87,6 +85,25 @@ router.put('/edit/user', async (req: Request, res: Response) => {
             res.status(500).json({ message: 'Ha habido un error en el servidor.' });
         }
     });
+});
+
+router.post('/user/password', (req, res) => {
+    const { oldPass, newPass } = req.body;
+    getUserId(req, res, async (userId: string) => {
+        const user = await User.findById(userId)
+        const isMatch = bcrypt.compareSync(oldPass, user.password);
+        if (isMatch) {
+            const hashedPassword = bcrypt.hashSync(newPass, 10);
+            await User.findOneAndUpdate(
+                { _id: userId },
+                { $set: { password: hashedPassword} },
+                { new: true }
+            );
+            res.status(200).send(true)
+        }
+        else
+            res.status(401).send(false);
+    })
 });
 
 export default router;

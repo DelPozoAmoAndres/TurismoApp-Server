@@ -1,13 +1,15 @@
 import express, { Request, Response } from 'express';
-import User, { Role } from '../../models/user';
+import User, { ReservationDoc, Role } from '../../models/user';
+import mongoose from 'mongoose';
 const { adminCheck } = require('../../services/tokenService');
+const { formatData, groupReservations } = require("../../services/reservationService")
 
 const router = express.Router();
 
 router.post('/register', async (req: Request, res: Response) => {
     adminCheck(req, res, async () => {
         try {
-            const { name, email, password, role } = req.body;
+            const { name, email, password, role, telephone, country, birthday } = req.body;
             // Comprobar si el usuario ya existe
             const user = await User.findOne({ email });
             if (user) {
@@ -22,7 +24,10 @@ router.post('/register', async (req: Request, res: Response) => {
                 name,
                 email,
                 password,
-                role
+                role,
+                telephone,
+                country,
+                birthday
             });
 
             await newUser.save();
@@ -73,9 +78,12 @@ router.get('/user', async (req: Request, res: Response) => {
         try {
 
             // Realizar la búsqueda de usuarios que coincidan con la expresión de consulta
-            const user = await User.findOne({ email: req.query.email });
-
-            res.status(200).json(user);
+            const user = await User.findOne({ _id: req.query.id });
+            if (user)
+                res.status(200).json(user);
+            else {
+                res.status(404).json({ message: 'Usuario no encontrado.' })
+            }
         } catch (error) {
             console.error(error);
             res.status(500).json({ message: 'Ha habido un error en el servidor.' });
@@ -86,8 +94,12 @@ router.get('/user', async (req: Request, res: Response) => {
 router.delete('/user', async (req: Request, res: Response) => {
     adminCheck(req, res, async () => {
         try {
+            if (req.query.id && !mongoose.Types.ObjectId.isValid(String(req.query.id))) {
+                res.status(404).json({ message: 'Usuario no encontrado.' });
+                return;
+            }
             // Realizar la búsqueda de usuarios que coincidan con la expresión de consulta
-            const user = await User.findOneAndRemove({ email: req.query.email });
+            const user = await User.findOneAndRemove({ _id: req.query.id });
             if (user)
                 res.status(200).json({ message: 'Usuario eliminado correctamente.' });
             else {
@@ -99,5 +111,42 @@ router.delete('/user', async (req: Request, res: Response) => {
         }
     });
 });
+
+router.put('/edit/user', async (req: Request, res: Response) => {
+    adminCheck(req, res, async () => {
+        try {
+            const { _id, ...user } = req.body;
+            await User.findOneAndUpdate({ _id: req.body._id }, user, { new: true });
+            res.status(200).json({ message: 'Usuario actualizado' })
+        } catch (error) {
+            console.error(error);
+            res.status(500).json({ message: 'Ha habido un error en el servidor.' });
+        }
+    });
+});
+
+router.get('/reservations', async (req: Request, res: Response) => {
+    adminCheck(req, res, async () => {
+        try {
+            // Realizar la búsqueda de usuarios que coincidan con la expresión de consulta
+            const user = await User.findById(req.query.userId);
+            let reservations: ReservationDoc[] = user.reservations ? user.reservations : [];
+
+            const result = await Promise.all(reservations.map(async (reservation) => {
+                return await formatData(reservation);
+            }));
+
+            // Ordenar las reservas por fecha de forma ascendente
+            result.sort((a, b) => a.event.date.getTime() - b.event.date.getTime());
+
+            let reservationGroups = await groupReservations(result)
+
+            res.status(200).json(reservationGroups);
+        } catch (error) {
+            console.error(error);
+            res.status(500).json({ message: 'Ha habido un error en el servidor.' });
+        }
+    })
+})
 
 export default router;

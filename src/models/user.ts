@@ -1,6 +1,7 @@
 import mongoose, { Document, Schema } from 'mongoose';
 import bcrypt from 'bcrypt';
-import { ReservationDoc, reservationSchema } from './reservation';
+import { ActivityDoc } from './activity';
+import { PaymentStatus } from './paymentService';
 
 export interface UserDoc extends Document {
     name: string;
@@ -13,6 +14,23 @@ export interface UserDoc extends Document {
     createdAt: Date;
     updatedAt: Date;
     reservations?: ReservationDoc[];
+    schedules:Schedule[];
+}
+
+export interface ReservationDoc extends Document {
+    numPersons:number;
+    price:number;
+    eventId:String;
+    name:String;
+    email:string;
+    telephone:number;
+    state:PaymentStatus;
+    paymentId:String;
+}
+
+export interface Schedule {
+    name:string,
+    activities:ActivityDoc[];
 }
 
 export enum Role { "administrador" = "admin", "turista" = "user", "guía" = "worker" }
@@ -26,7 +44,15 @@ const UserSchema = new Schema<UserDoc>(
         telephone: { type: Number, required: false },
         password: { type: String, required: true },
         role: { type: String, required: true },
-        reservations: [reservationSchema]
+        reservations: [{
+            numPersons: { type: Number, required: true },
+            eventId: { type: String, required: true },
+            email: { type: String, required: true },
+            name: { type: String, required: false },
+            telephone: { type: Number, required: true },
+            paymentId: {type: String, required: true},
+            price: {type:Number, required:true}
+        }]
 
     },
     { timestamps: true }

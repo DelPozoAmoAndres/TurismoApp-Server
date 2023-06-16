@@ -1,10 +1,10 @@
-import Activity from '../../models/activity';
+import Activity, { EventDoc } from '../../models/activity';
 import express, { Request, Response } from 'express';
-import Event, { EventDoc } from '../../models/event';
 import User, { Role } from '../../models/user';
 const { adminCheck } = require('../../services/tokenService');
 const mongoose = require('mongoose');
-
+import { logger } from "../../utils/logger";
+import activity from '../../models/activity';
 const router = express.Router();
 
 
@@ -16,14 +16,17 @@ router.post('/activity', async (req, res) => {
 
             if (validationError) {
                 const missingProperties = Object.keys(validationError.errors).join(', ');
+                logger.error(`Error al registrar la actividad. Faltan datos requeridos: ${missingProperties}`)
                 res.status(400).json({ message: `Error al registrar la actividad. Faltan datos requeridos: ${missingProperties}` });
             }
             else {
                 await createdActivity.save();
+                logger.info('Actividad registrada correctamente:', createdActivity)
                 res.status(201).json({ message: 'Actividad registrada correctamente' });
             }
         } catch (error) {
             console.error(error);
+            logger.error('Ha habido un error al crear una actividad', req.body)
             res.status(500).json({ message: 'Ha habido un error en el servidor.' });
         }
     });
@@ -88,10 +91,10 @@ router.post('/event', async (req: Request, res: Response) => {
             const { language, price, seats, guide, date } = req.body.event
             const repeatInfo = req.body.repeatInfo;
 
-            let events: EventDoc[] = actividad.events ? actividad.events : [];
+            let events: any[] = actividad.events ? actividad.events : [];
 
             const user = await User.find({ role: Role.guía, _id: guide });
-            if (!(user?.length >0)) {
+            if (!(user?.length > 0)) {
                 res.status(404).json({ message: "Guía no encontrado" })
                 return;
             }
@@ -102,7 +105,7 @@ router.post('/event', async (req: Request, res: Response) => {
                 days.forEach((day) => {
                     let date = new Date(day);
                     date.setHours(time[0], time[1])
-                    events.push(new Event({ bookedSeats: 0, date, language, price, seats, guide }))
+                    events.push({ bookedSeats: 0, date, language, price, seats, guide })
                 })
             }
             else if (repeatInfo?.repeatType == "range") {
@@ -113,13 +116,13 @@ router.post('/event', async (req: Request, res: Response) => {
                     if (repeatInfo.repeatDays.includes(currDate.getDay())) {
                         let date = new Date(currDate);
                         date.setHours(time[0], time[1])
-                        events.push(new Event({ bookedSeats: 0, date, language, price, seats, guide }))
+                        events.push({ bookedSeats: 0, date, language, price, seats, guide })
                     }
                     currDate.setDate(currDate.getDate() + 1);
                 }
             }
             else {
-                events.push(new Event({ bookedSeats: 0, date: new Date(date!), language, price, seats, guide }))
+                events.push({ bookedSeats: 0, date: new Date(date!), language, price, seats, guide })
             }
             actividad.events = events;
             actividad.save()
@@ -129,6 +132,23 @@ router.post('/event', async (req: Request, res: Response) => {
             res.status(500).json({ message: 'Ha habido un error en el servidor.' });
         }
     });
+});
+
+//Reportar comentario
+router.delete('/review', async (req: Request, res: Response) => {
+    adminCheck(req, res, async () => {
+        try {
+            let activity = await Activity.findOne(
+                { 'reviews._id': req.query.id })
+            const reviews = activity.reviews.filter((review) => String(review._id) !== req.query.id)
+            activity.reviews = reviews;
+            activity.save();
+            res.status(200).json({ message: "Ha sido eliminado el comentario" });
+        } catch (error) {
+            console.error(error);
+            res.status(500).json({ message: 'Ha habido un error en el servidor.' });
+        }
+    })
 });
 
 export default router;
