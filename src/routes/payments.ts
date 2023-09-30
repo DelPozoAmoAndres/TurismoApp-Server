@@ -1,6 +1,5 @@
 import express from 'express';
-import { PaymentIntent } from '../models/paymentService';
-import User from '../models/user';
+import { PaymentIntent } from '@customTypes/payment';
 
 const router = express.Router();
 const { createIntent, verifyStatus, confirmIntent } = require('../services/stripeService');

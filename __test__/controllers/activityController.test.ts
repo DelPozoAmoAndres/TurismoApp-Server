@@ -1,0 +1,159 @@
+import request,{ Response } from 'supertest';
+import app from "@app";
+
+jest.mock("@services/activityService");
+import ActivityService from "@services/activityService";
+const mockedActivityService = ActivityService as jest.Mocked<typeof ActivityService>;
+
+const baseUrl = '/api/activity';
+
+describe('GET /list', () => {
+    describe('when the price filter is invalid', () => {
+        test('shoud respond with a 400 status code', async () => {
+            const res: Response = await request(app)
+                .get('/api/activity/list')
+                .query({ precio: "a" })
+            expect(res.status).toBe(400);
+            expect(res.body).toStrictEqual({ message: 'Filtro de precio con formato incorrecto' });
+        });
+    });
+
+    describe('when the duration filter is invalid', () => {
+        test('shoud respond with a 400 status code', async () => {
+            const res: Response = await request(app)
+                .get('/api/activity/list')
+                .query({ duration: "a" })
+            expect(res.status).toBe(400);
+            expect(res.body).toStrictEqual({ message: 'Filtro de duración con formato incorrecto' });
+        });
+    });
+
+    describe('when the search is valid', () => {
+        beforeAll(() => {
+            mockedActivityService.prototype.getAllActivities = jest.fn().mockReturnValue([{ name: 'test' }]);
+        });
+
+        test('shoud respond with a 200 status code', async () => {
+            const res: Response = await request(app)
+                .get('/api/activity/list')
+            expect(res.status).toBe(200);
+            expect(res.body).toStrictEqual([{ name: 'test' }]);
+        });
+    });
+
+    describe('when the activityService throws a default error', () => {
+        beforeAll(() => {
+            mockedActivityService.prototype.getAllActivities = jest.fn().mockRejectedValue(new Error());
+        });
+
+        test('shoud respond with a 500 status code', async () => {
+            const res: Response = await request(app)
+                .get('/api/activity/list')
+            expect(res.status).toBe(500);
+            expect(res.body).toStrictEqual({ message: 'Ha habido un error en el servidor.' });
+        });
+    });
+
+    describe('when the activityService throws a custom error', () => {
+        const error = { status: 400, message: 'Test error' };
+
+        beforeAll(() => {
+            mockedActivityService.prototype.getAllActivities = jest.fn().mockRejectedValue(error);
+        });
+
+        test("shoud respond with the status code of the custom error", async () => {
+            const res: Response = await request(app)
+                .get('/api/activity/list')
+            expect(res.status).toBe(400);
+            expect(res.body).toStrictEqual({ message: 'Test error' });
+        });
+    });
+});
+
+describe('GET /:id', () => {
+    describe('when the id is valid', () => {
+        beforeAll(() => {
+            mockedActivityService.prototype.getOneActivity = jest.fn().mockReturnValue({ name: 'test' });
+        });
+
+        test('shoud respond with a 200 status code', async () => {
+            const res: Response = await request(app)
+                .get('/api/activity/120')
+            expect(res.status).toBe(200);
+            expect(res.body).toStrictEqual({ name: 'test' });
+        });
+    });
+    describe('when the activityService throws a default error', () => {
+        beforeAll(() => {
+            mockedActivityService.prototype.getOneActivity = jest.fn().mockRejectedValue(new Error());
+        });
+
+        test('shoud respond with a 500 status code', async () => {
+            const res: Response = await request(app)
+                .get('/api/activity/120')
+            expect(res.status).toBe(500);
+            expect(res.body).toStrictEqual({ message: 'Ha habido un error en el servidor.' });
+        });
+    });
+
+    describe('when the activityService throws a custom error', () => {
+        const error = { status: 400, message: 'Test error' };
+
+        beforeAll(() => {
+            mockedActivityService.prototype.getOneActivity = jest.fn().mockRejectedValue(error);
+        });
+        test("shoud respond with the status code of the custom error", async () => {
+
+            const res: Response = await request(app)
+                .get('/api/activity/120')
+            expect(res.status).toBe(400);
+            expect(res.body).toStrictEqual({ message: 'Test error' });
+        });
+    });
+});
+
+describe('GET /activity/:id/events', () => {
+    const url = baseUrl + '/1/events'
+
+    afterEach(()=>{
+        jest.restoreAllMocks();
+    })
+
+    describe('when the activity exists', () => {
+        const mockedEvents = [{_id: '1', name: 'event1'}, {_id: '2', name: 'event2'}]
+        beforeEach(() => {
+            mockedActivityService.prototype.getEvents= jest.fn().mockReturnValue(mockedEvents);
+        })
+
+        it('should return the events', async () => {
+            const response : Response = await request(app).get(url)
+            expect(response.status).toBe(200)
+            expect(response.body).toEqual(mockedEvents)
+        })
+    });
+
+    describe('when the authservice throws a default error', () => {
+        beforeEach(() => {
+            mockedActivityService.prototype.getEvents = jest.fn().mockRejectedValue(new Error());
+        });
+
+        it('should respond with a 500 status code', async () => {
+            const response : Response = await request(app).get(url)
+            expect(response.status).toBe(500)
+            expect(response.body).toStrictEqual({ message: 'Ha habido un error en el servidor.' })
+        });
+    });
+
+    describe('when the authservice throws a custom error', () => {
+        const error = {status: 400, message: 'Test error'}
+        beforeEach(() => {
+            mockedActivityService.prototype.getEvents= jest.fn().mockRejectedValue(error);
+        });
+
+        it('should respond with the status code of the custom error', async () => {
+            const response :Response = await request(app).get(url)
+            expect(response.status).toBe(error.status)
+            expect(response.body).toStrictEqual({ message: error.message })
+        });
+    });
+});

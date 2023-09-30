@@ -1,5 +1,5 @@
-const app = require("./app")
-import { logger } from "./utils/logger";
+import app from "@app";
+import { logger } from "@utils/logger";
 
 //Database
 const mongoose = require('mongoose');
@@ -14,9 +14,6 @@ mongoose.connect(process.env.MONGODB_URI, {
 
 // Iniciar servidor
 const PORT = process.env.PORT || 3000;
-const server = app.listen(PORT, () => {
+app.listen(PORT, () => {
     logger.info(`Servidor iniciado en el puerto ${PORT}`);
 });
-
-
-

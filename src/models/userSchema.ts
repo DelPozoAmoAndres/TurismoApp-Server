@@ -1,41 +1,8 @@
-import mongoose, { Document, Schema } from 'mongoose';
+import mongoose, { Schema } from "mongoose";
+import { User } from "../customTypes/user";
 import bcrypt from 'bcrypt';
-import { ActivityDoc } from './activity';
-import { PaymentStatus } from './paymentService';
 
-export interface UserDoc extends Document {
-    name: string;
-    email: string;
-    birthday : Date;
-    telephone: Number;
-    country: string;
-    password: string;
-    role: Role;
-    createdAt: Date;
-    updatedAt: Date;
-    reservations?: ReservationDoc[];
-    schedules:Schedule[];
-}
-
-export interface ReservationDoc extends Document {
-    numPersons:number;
-    price:number;
-    eventId:String;
-    name:String;
-    email:string;
-    telephone:number;
-    state:PaymentStatus;
-    paymentId:String;
-}
-
-export interface Schedule {
-    name:string,
-    activities:ActivityDoc[];
-}
-
-export enum Role { "administrador" = "admin", "turista" = "user", "guía" = "worker" }
-
-const UserSchema = new Schema<UserDoc>(
+const UserScheme = new Schema<User>(
     {
         name: { type: String, required: true },
         email: { type: String, required: true, unique: true },
@@ -52,14 +19,14 @@ const UserSchema = new Schema<UserDoc>(
             telephone: { type: Number, required: true },
             paymentId: {type: String, required: true},
             price: {type:Number, required:true}
-        }]
+        }],
 
     },
     { timestamps: true }
 );
 
 // Antes de guardar un usuario, hasheamos su contraseña
-UserSchema.pre<UserDoc>('save', async function () {
+UserScheme.pre<User>('save', async function () {
     const user = this;
 
     if (user.isModified('password')) {
@@ -70,7 +37,7 @@ UserSchema.pre<UserDoc>('save', async function () {
 });
 
 // Antes de actualizar un usuario, hasheamos su contraseña
-UserSchema.pre<UserDoc>('findOneAndUpdate', async function () {
+UserScheme.pre<User>('findOneAndUpdate', async function () {
     const query = this as any; // referencia a la query
     const update = query.getUpdate(); // obtiene el objeto update de la query
     if (update.password && !update.password.includes("$2b&10$")) { // chequea si hay una nueva contraseña
@@ -80,6 +47,6 @@ UserSchema.pre<UserDoc>('findOneAndUpdate', async function () {
     }
 });
 
-const User = mongoose.model<UserDoc>('User', UserSchema);
+const UserSchema = mongoose.model<User>('User', UserScheme);
 
-export default User;
+export default UserSchema;

@@ -7,9 +7,18 @@
       "moduleResolution": "node",
       "sourceMap": true,
       "outDir": "dist",
-      "baseUrl": "."
+      "baseUrl": "./src/",
+      "paths": {
+        "@controllers/*": ["controllers/*"],
+        "@services/*": ["services/*"],
+        "@customTypes/*": ["customTypes/*"],
+        "@models/*": ["models/*"],
+        "@utils/*": ["utils/*"],
+        "@routes/*": ["routes/*"],
+        "@app": ["app"],
+    }
     },
-    "include": ["src/**/*", "__test__"],
+    "include": ["src/**/*", "__test__/**/*"],
     "exclude": ["node_modules"]
   }
   

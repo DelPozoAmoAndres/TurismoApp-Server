@@ -6,8 +6,9 @@
   "scripts": {
     "build": "tsc",
     "start": "node dist/index.js",
-    "dev": "nodemon src/index.ts",
-    "test": "jest"
+    "dev": "nodemon --watch 'src/**/*.ts' --exec nodemon --files src/server.ts",
+    "d": "nodemon --exec ts-node -r tsconfig-paths/register src/server.ts",
+    "test": "jest --coverage"
   },
   "repository": {
     "type": "git",
@@ -48,6 +49,7 @@
     "swagger-ui-express": "^4.6.3",
     "ts-jest": "^29.1.0",
     "ts-node": "^10.9.1",
+    "tsconfig-paths": "^4.2.0",
     "typescript": "^5.0.4",
     "winston": "^3.9.0",
     "winston-daily-rotate-file": "^4.7.1"

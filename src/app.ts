@@ -1,42 +1,45 @@
-const express = require('express');
-const bodyParser = require('body-parser')
-const cors = require('cors')
+import express from 'express';
+import bodyParser from 'body-parser';
+import cors from 'cors';
+import dotenv from 'dotenv';
 
+import {authMiddleware} from './middleware/authMiddleware';
+// import { loggerMiddleware } from '@utils/logger';
 
-require('dotenv').config();
+dotenv.config();
 
-const glob = require('glob');
-const path = require('path');
-
-import users from './routes/users';
-import activities from './routes/activities';
-import reservations from './routes/reservations';
-import adminUsers from './routes/Admin/admin-users';
-import adminActivities from './routes/Admin/admin-activities';
-import payments from './routes/payments';
+import authRoutes from '@routes/authRoutes'
+import userRoutes from '@routes/userRoutes';
+import activityRoutes from '@routes/activityRoutes';
+import adminActivityRoutes from '@routes/adminActivityRoutes';
+import adminUserRoutes from '@routes/adminUserRoutes';
+import reservations from '@routes/reservationRoutes';
+import reviews from '@routes/reviewRoutes';
+import { Role } from '@customTypes/user';
 
 const app = express();
 
-import { loggerMiddleware } from './utils/logger';
+// Logger middleware
+// app.use(loggerMiddleware);
 
-// Middlewar
-app.use(loggerMiddleware);
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cors());
 
 //Swagger
 const swaggerUi = require('swagger-ui-express');
-const swaggerDocument = require('../swagger.json');
+const swaggerDocument = require('../swagger2.json');
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 // Rutas
-app.use('/api', users);
-app.use('/api/admin', adminUsers);
-app.use('/api/admin', adminActivities);
-app.use('/api', activities);
-app.use('/api', payments);
-app.use('/api', reservations);
+app.use('/api', authRoutes);
+app.use('/api/user', authMiddleware(Role.turista), userRoutes);
+app.use('/api/activity', activityRoutes);
+app.use('/api/admin/activity',authMiddleware(Role.administrador), adminActivityRoutes);
+app.use('/api/admin1/user',authMiddleware(Role.administrador), adminUserRoutes);
+app.use('/api/reservations',authMiddleware(Role.turista), reservations);
+app.use('/api/reviews',authMiddleware(Role.turista), reviews);
+// app.use('/api', payments);
+// app.use('/api', reservations);
 
-
-module.exports = app;
+export default app;

@@ -1,4 +1,4 @@
-export interface PaymentService {
+export interface Payment {
     createIntent(amount: number): Promise<string>;
     verifyStatus(intentId: string): Promise<PaymentStatus>;
   }
