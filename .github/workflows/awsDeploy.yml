@@ -32,6 +32,10 @@ jobs:
           aws configure set aws_secret_access_key ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws configure set default.region eu-west-3c 
 
+      - name: Configurar EB CLI
+        run: |
+          eb init turismo
+          
       - name: Despliegue a Elastic Beanstalk
         run: |
           eb deploy Turismo-env
