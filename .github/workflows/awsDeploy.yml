@@ -1,0 +1,30 @@
+name: Despliegue a AWS Elastic Beanstalk
+
+on:
+  push:
+    branches:
+      - main  # Cambia esto si tu rama principal tiene otro nombre
+
+jobs:
+  despliegue:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout del Código
+        uses: actions/checkout@v2
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: 14  # Cambia esto según la versión de Node.js que estés utilizando
+
+      - name: Instalar Dependencias
+        run: npm install  # O yarn install si usas Yarn
+
+      - name: Despliegue a Elastic Beanstalk
+        run: |
+          eb Turismo-env 
+          eb Turismo-env --wait-environment-to-terminate
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
