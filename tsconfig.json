@@ -16,7 +16,7 @@
         "@utils/*": ["utils/*"],
         "@routes/*": ["routes/*"],
         "@app": ["app"],
-    }
+      }
     },
     "include": ["src/**/*", "__test__/**/*"],
     "exclude": ["node_modules"]
