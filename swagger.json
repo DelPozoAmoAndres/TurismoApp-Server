@@ -108,7 +108,7 @@
           }
         }
       },
-      "/api/edit/user": {
+      "/api/user/edit": {
         "put": {
           "summary": "Actualiza los datos del usuario.",
           "description": "Actualiza los datos del usuario en la base de datos o sistema de almacenamiento.",

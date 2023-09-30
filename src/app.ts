@@ -17,6 +17,8 @@ import reservations from '@routes/reservationRoutes';
 import reviews from '@routes/reviewRoutes';
 import { Role } from '@customTypes/user';
 
+import swagger from '../swagger.json'
+
 const app = express();
 
 // Logger middleware
@@ -28,7 +30,7 @@ app.use(cors());
 
 //Swagger
 const swaggerUi = require('swagger-ui-express');
-const swaggerDocument = require('../swagger.json');
+const swaggerDocument = swagger;
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 // Rutas

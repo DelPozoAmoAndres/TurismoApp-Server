@@ -2,10 +2,10 @@
   "name": "astour-server",
   "version": "1.0.0",
   "description": "",
-  "main": "index.ts",
+  "main": "server.js",
   "scripts": {
     "build": "tsc",
-    "start": "node dist/index.js",
+    "start": "node dist/src/server.js",
     "dev": "nodemon --watch 'src/**/*.ts' --exec nodemon --files src/server.ts",
     "d": "nodemon --exec ts-node -r tsconfig-paths/register src/server.ts",
     "test": "jest --coverage"
@@ -56,7 +56,17 @@
   },
   "dependencies": {
     "express-ip": "^1.0.4",
+    "module-alias": "^2.2.3",
     "multer": "*",
     "stripe": "^12.7.0"
+  },
+  "_moduleAliases": {
+    "@controllers": "dist/src/controllers",
+    "@services": "dist/src/services",
+    "@customTypes": "dist/src/customTypes",
+    "@models": "dist/src/models",
+    "@utils": "dist/src/utils",
+    "@routes": "dist/src/routes",
+    "@app": "dist/src/app"
   }
 }

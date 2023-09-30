@@ -1,3 +1,6 @@
+//Alias de los modelos en dist
+require('module-alias/register');
+
 import app from "@app";
 import { logger } from "@utils/logger";
 
