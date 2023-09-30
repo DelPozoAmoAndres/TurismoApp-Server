@@ -34,7 +34,7 @@ jobs:
 
       - name: Configurar EB CLI
         run: |
-          eb init turismo
+          eb init turismo --region tu-region eu-west-3c
           
       - name: Despliegue a Elastic Beanstalk
         run: |
