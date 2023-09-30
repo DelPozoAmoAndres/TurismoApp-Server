@@ -23,7 +23,7 @@ jobs:
 
       - name: Instalar AWS CLI
         run: |
-          pip install --user awscli
+          pip install awsebcli
           export PATH=$PATH:$HOME/.local/bin
 
       - name: Configurar AWS CLI
