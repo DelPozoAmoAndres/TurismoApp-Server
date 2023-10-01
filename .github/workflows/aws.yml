@@ -19,7 +19,7 @@ jobs:
 
   deploy:
     needs: build
-    runs-on: [ec2-turismo]
+    runs-on: self-hosted
     steps:
       - name: Pull image from docker hub
         run: docker pull ${{ secrets.DOCKER_USERNAME }}/turismo-server:latest
