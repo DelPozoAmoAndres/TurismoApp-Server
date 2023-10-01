@@ -18,9 +18,9 @@ jobs:
         run: npm install
       - name: Create .env file
         run: |
-          echo DB_HOST=${{ secrets.DB_HOST }} >> .env
-          echo DB_USER=${{ secrets.DB_USER }} >> .env
-          echo DB_PASS=${{ secrets.DB_PASS }} >> .env
+          echo MONGODB_URI: ${{ secrets.MONGODB_URI }} >> .env
+          echo JWT_SECRET: ${{ secrets.JWT_SECRET }} >> .env
+          echo CLAVE_SECRETA_DE_STRIPE_TEST: ${{ secrets.CLAVE_SECRETA_DE_STRIPE_TEST }} >> .env
       - name: Run tests with coverage
         run: npm test -- --coverage
       - name: Upload coverage reports to Codecov
