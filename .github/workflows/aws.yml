@@ -30,9 +30,9 @@ jobs:
         run: docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
       - name: Create .env file
         run: |
-          echo MONGODB_URI: ${{ secrets.MONGODB_URI }} >> .env
-          echo JWT_SECRET: ${{ secrets.JWT_SECRET }} >> .env
-          echo CLAVE_SECRETA_DE_STRIPE_TEST: ${{ secrets.CLAVE_SECRETA_DE_STRIPE_TEST }} >> .env
+          echo 'MONGODB_URI: ${{ secrets.MONGODB_URI }}' >> .env
+          echo 'JWT_SECRET: ${{ secrets.JWT_SECRET }}' >> .env
+          echo 'CLAVE_SECRETA_DE_STRIPE_TEST: ${{ secrets.CLAVE_SECRETA_DE_STRIPE_TEST }}' >> .env
       - name: Build docker image
         run: docker build -t ${{ secrets.DOCKER_USERNAME }}/turismo-server:latest .
       - name: Publish image to docker hub
