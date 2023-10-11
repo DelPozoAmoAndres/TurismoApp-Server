@@ -1,8 +1,10 @@
-//Alias de los modelos en dist
-require('module-alias/register');
+// //Alias de los modelos en dist
+if (__filename.endsWith('.js')) {
+    require('module-alias/register');
+}
 
 import app from "@app";
-import { logger } from "@utils/logger";
+const {logger}  = require("@utils/logger");
 
 //Database
 const mongoose = require('mongoose');
@@ -20,3 +22,5 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
     logger.info(`Servidor iniciado en el puerto ${PORT}`);
 });
+
+export default app;

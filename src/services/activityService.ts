@@ -5,19 +5,18 @@ export default class ActivityService {
     getAllActivities = async (queryOptions: QueryOptions) => {
         let query = {
             $and: [
-                queryOptions.searchString && {
+                queryOptions.searchString ? {
                     $or: [
                         { name: { $regex: queryOptions.searchString, $options: 'i' } },
                         { description: { $regex: queryOptions.searchString, $options: 'i' } },
                         { location: { $regex: queryOptions.searchString, $options: 'i' } }
                     ]
-                },
-                queryOptions.duration && Number.isSafeInteger(queryOptions.duration) && { duration: { $lt: Number(queryOptions.duration) * 60 } },
-                queryOptions.petsPermited && { petsPermited: queryOptions.petsPermited },
-                queryOptions.state && { state: queryOptions.state }
+                }:{},
+                queryOptions.duration && Number.isSafeInteger(queryOptions.duration) ? { duration: { $lt: Number(queryOptions.duration) * 60 } }:{},
+                queryOptions.petsPermited ? { petsPermited: queryOptions.petsPermited }:{},
+                queryOptions.state ? { state: queryOptions.state }:{}
             ],
         };
-        
         try {
             const activities = queryOptions.price && Number.isSafeInteger(queryOptions.price) ?
                 await Activity.find(query)
@@ -26,6 +25,7 @@ export default class ActivityService {
                     .lt(queryOptions.price)
                 :
                 await Activity.find(query);
+            activities.forEach(activity => {activity.events =activity?.events?.filter(event => new Date(event.date) >= new Date());});
             return activities
         } catch (error) {
             throw {
@@ -45,6 +45,8 @@ export default class ActivityService {
         let activity;
         try {
             activity = await Activity.findById(activityId);
+            activity.events =activity?.events?.filter(event => new Date(event.date) >= new Date());
+
         } catch (error) {
             throw {
                 status: error?.status || 500,
@@ -67,7 +69,9 @@ export default class ActivityService {
                 status: 400,
                 message: "El id de la actividad no es válido"
             }
-        const activity = await Activity.findById(activityId)
+            const activity = await Activity.findById(activityId, {
+                events: { $elemMatch: { date: { $gte: new Date() } } },
+              }).exec();
         if (!activity)
             throw {
                 status: 404,

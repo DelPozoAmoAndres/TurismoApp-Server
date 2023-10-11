@@ -20,7 +20,7 @@ export default class AuthService {
                     message: 'Credenciales incorrectas.'
                 }
             const isMatch = await bcrypt.compareSync(password, user.password);
-            if (!isMatch) {
+            if (isMatch) {
                 throw {
                     status: 401,
                     message: 'Credenciales incorrectas.'

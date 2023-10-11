@@ -3,8 +3,8 @@ import bodyParser from 'body-parser';
 import cors from 'cors';
 import dotenv from 'dotenv';
 
-import {authMiddleware} from './middleware/authMiddleware';
-// import { loggerMiddleware } from '@utils/logger';
+import {authMiddleware} from './src/middleware/authMiddleware';
+const { loggerMiddleware } = require('@utils/logger');
 
 dotenv.config();
 
@@ -15,14 +15,15 @@ import adminActivityRoutes from '@routes/adminActivityRoutes';
 import adminUserRoutes from '@routes/adminUserRoutes';
 import reservations from '@routes/reservationRoutes';
 import reviews from '@routes/reviewRoutes';
+import payments from '@routes/paymentRoutes';
 import { Role } from '@customTypes/user';
 
-import swagger from '../swagger.json'
+import swagger from './swagger.json'
 
 const app = express();
 
 // Logger middleware
-// app.use(loggerMiddleware);
+app.use(loggerMiddleware);
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -41,7 +42,6 @@ app.use('/api/admin/activity',authMiddleware(Role.administrador), adminActivityR
 app.use('/api/admin1/user',authMiddleware(Role.administrador), adminUserRoutes);
 app.use('/api/reservations',authMiddleware(Role.turista), reservations);
 app.use('/api/reviews',authMiddleware(Role.turista), reviews);
-// app.use('/api', payments);
-// app.use('/api', reservations);
+app.use('/api/payment', authMiddleware(Role.turista),payments);
 
 export default app;
