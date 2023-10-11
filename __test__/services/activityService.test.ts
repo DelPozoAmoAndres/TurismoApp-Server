@@ -169,7 +169,9 @@ describe('Get events by activity id', () => {
           } as ActivityDoc;
         beforeAll(()=>{
             mockedMongoose.Types.ObjectId.isValid = jest.fn().mockReturnValue(true);
-            mockedActivity.findById.mockResolvedValue(activity);
+            mockedActivity.findById.mockReturnValue({
+                exec: jest.fn().mockResolvedValue(activity),
+            }as any);
         });
 
         test('Should return the events', async () => {
@@ -192,7 +194,9 @@ describe('Get events by activity id', () => {
           } as ActivityDoc;
         beforeAll(()=>{
             mockedMongoose.Types.ObjectId.isValid = jest.fn().mockReturnValue(true);
-            mockedActivity.findById.mockResolvedValue(activity);
+            mockedActivity.findById.mockReturnValue({
+                exec: jest.fn().mockResolvedValue(activity),
+            }as any);
         });
 
         test('Should return an error', async () => {
@@ -206,7 +210,9 @@ describe('Get events by activity id', () => {
     describe('When the activity does not exist', () => {
         beforeAll(()=>{
             mockedMongoose.Types.ObjectId.isValid = jest.fn().mockReturnValue(true);
-            mockedActivity.findById.mockResolvedValue(null);
+            mockedActivity.findById.mockReturnValue({
+                exec: jest.fn().mockResolvedValue(null),
+            }as any);
         });
 
         test('Should return an error', async () => {

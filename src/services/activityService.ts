@@ -45,7 +45,14 @@ export default class ActivityService {
         let activity;
         try {
             activity = await Activity.findById(activityId);
-            activity.events =activity?.events?.filter(event => new Date(event.date) >= new Date());
+
+            if (!activity)
+                throw {
+                    status: 404,
+                    message: 'Actividad no encontrada'
+                }
+                
+            activity.events = activity?.events?.filter(event => new Date(event.date) >= new Date()) || [];
 
         } catch (error) {
             throw {
@@ -54,11 +61,7 @@ export default class ActivityService {
             }
         }
 
-        if (!activity)
-            throw {
-                status: 404,
-                message: 'Actividad no encontrada'
-            }
+       
 
         return activity
     }

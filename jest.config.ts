@@ -13,7 +13,7 @@ const config: Config.InitialOptions = {
     "@models/(.*)": "<rootDir>/src/models/$1",
     "@routes/(.*)": "<rootDir>/src/routes/$1",
     "@utils/(.*)": "<rootDir>/src/utils/$1",
-    "@app": "<rootDir>/src/app.ts",
+    "@app": "<rootDir>/app.ts",
   }
 };
 export default config;
