@@ -53,3 +53,5 @@ jobs:
       - name: Prepare docker-compose.yml
         run: |
           sed 's/%%DOCKER_USERNAME%%/${{ secrets.DOCKER_USERNAME }}/g' docker-compose.template.yml > docker-compose.yml
+      - name: Start new docker-compose deployment
+        run: docker-compose up -d
