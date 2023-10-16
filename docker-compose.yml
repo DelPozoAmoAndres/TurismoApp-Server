@@ -1,0 +1,23 @@
+version: '3'
+
+services:
+  webapp:
+    image: ${{ secrets.DOCKER_USERNAME }}/turismo-server:latest
+    ports:
+      - "3000:3000"
+
+  caddy:
+    image: caddy:2
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - webapp
+
+volumes:
+  caddy_data:
+  caddy_config:

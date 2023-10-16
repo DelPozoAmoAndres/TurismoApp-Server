@@ -1,0 +1,3 @@
+backend.astour.online {
+    reverse_proxy webapp:3000
+}

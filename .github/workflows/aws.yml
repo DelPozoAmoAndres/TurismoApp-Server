@@ -42,9 +42,13 @@ jobs:
     needs: build
     runs-on: self-hosted
     steps:
+      - name: Checkout source
+        uses: actions/checkout@v2
       - name: Pull image from docker hub
-        run: docker pull ${{ secrets.DOCKER_USERNAME }}/turismo-server:latest
-      - name: Delete old container
-        run: docker rm -f nodejs-app-container || true
-      - name: Run docker container
-        run: docker run -d -p 3000:3000 --name nodejs-app-container ${{ secrets.DOCKER_USERNAME }}/turismo-server:latest
+        run: |
+          docker pull ${{ secrets.DOCKER_USERNAME }}/turismo-server:latest
+          docker pull caddy:2
+      - name: Stop previous docker-compose deployment
+        run: docker-compose down || true
+      - name: Start new docker-compose deployment
+        run: docker-compose up -d
