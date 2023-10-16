@@ -33,7 +33,6 @@ jobs:
           echo 'MONGODB_URI: ${{ secrets.MONGODB_URI }}' >> .env
           echo 'JWT_SECRET: ${{ secrets.JWT_SECRET }}' >> .env
           echo 'CLAVE_SECRETA_DE_STRIPE_TEST: ${{ secrets.CLAVE_SECRETA_DE_STRIPE_TEST }}' >> .env
-          echo 'DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}' >> .env
       - name: Build docker image
         run: docker build -t ${{ secrets.DOCKER_USERNAME }}/turismo-server:latest .
       - name: Publish image to docker hub
@@ -51,5 +50,6 @@ jobs:
           docker pull caddy:2
       - name: Stop previous docker-compose deployment
         run: docker-compose down || true
-      - name: Start new docker-compose deployment
-        run: docker-compose up -d
+      - name: Prepare docker-compose.yml
+        run: |
+          sed 's/%%DOCKER_USERNAME%%/${{ secrets.DOCKER_USERNAME }}/g' docker-compose.template.yml > docker-compose.yml
