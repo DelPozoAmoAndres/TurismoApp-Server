@@ -2,7 +2,7 @@ version: '3'
 
 services:
   webapp:
-    image: ${ DOCKER_USERNAME }/turismo-server:latest
+    %%DOCKER_USERNAME%%/turismo-server:latest
     ports:
       - "3000:3000"
 
