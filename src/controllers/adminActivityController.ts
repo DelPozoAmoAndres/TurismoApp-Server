@@ -64,7 +64,7 @@ export default class AdminActivityController {
     }
 
     addEvents = async (req: Request, res: Response) => {
-        const { body: { event, repeatInfo }, params: { activityId } } = req
+        const { body: { event, repeatInfo }, params: { id } } = req
         if (!event || !event.language || !event.price || !event.guide || !event.seats) {
             logger.error("[AddEvent] Faltan los datos del evento a añadir");
             return res.status(400).json({ message: 'Faltan los datos del evento a añadir' });
@@ -121,7 +121,7 @@ export default class AdminActivityController {
         }
 
         try {
-            await this.adminActivityService.addEvents(activityId, events);
+            await this.adminActivityService.addEvents(id, events);
             return res.status(200).json({ message: 'Eventos añadidos con exito' });
         } catch (error) {
             logger.error("[AddEvent] Ha ocurrido un error en el servidor durante la creación de un evento", error);

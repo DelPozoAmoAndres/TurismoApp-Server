@@ -96,7 +96,6 @@ export default class AdminActivityService {
                     message: 'Usuario guía no encontrado'
                 }
 
-
             let events: any[] = activity.events ? activity.events : [];
             activity.events = [...events, ...newEvents];
             return await activity.save()

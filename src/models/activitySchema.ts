@@ -8,7 +8,7 @@ const activitySchema: Schema = new Schema({
   duration: { type: Number, required: true },
   events: [{
     seats: { type: Number, required: true },
-    bookedSeats: { type: Number, required: true },
+    bookedSeats: { type: Number, required: false },
     guide: { type: String, required: true },
     date: { type: Date, required: true },
     language: { type: String, required: true },

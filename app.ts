@@ -11,6 +11,7 @@ dotenv.config();
 import authRoutes from '@routes/authRoutes'
 import userRoutes from '@routes/userRoutes';
 import activityRoutes from '@routes/activityRoutes';
+import eventRoutes from '@routes/eventRoutes';
 import adminActivityRoutes from '@routes/adminActivityRoutes';
 import adminUserRoutes from '@routes/adminUserRoutes';
 import reservations from '@routes/reservationRoutes';
@@ -38,6 +39,7 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 app.use('/api', authRoutes);
 app.use('/api/user', authMiddleware(Role.turista), userRoutes);
 app.use('/api/activity', activityRoutes);
+app.use('/api/events', authMiddleware(Role.guía), eventRoutes);
 app.use('/api/admin/activity',authMiddleware(Role.administrador), adminActivityRoutes);
 app.use('/api/admin1/user',authMiddleware(Role.administrador), adminUserRoutes);
 app.use('/api/reservations',authMiddleware(Role.turista), reservations);
