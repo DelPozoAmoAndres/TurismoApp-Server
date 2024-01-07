@@ -37,12 +37,13 @@ export default class EventService {
             }
         let participants;
         try {
-            participants = await UserSchema.find({'reservations.eventId': eventId });
+            participants = await UserSchema.find({'reservations.eventId': eventId, 'reservations.state': 'success'});
             if (!participants)
                 throw {
                     status: 404,
                     message: 'Evento no encontrado'
                 }
+                participants = participants.flatMap((participant: any) =>participant.reservations.filter((reservation: any) => reservation.eventId === eventId && reservation.state === 'success'));
                 
         } catch (error) {
             throw {

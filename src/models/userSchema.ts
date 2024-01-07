@@ -1,6 +1,7 @@
 import mongoose, { Schema } from "mongoose";
 import { User } from "../customTypes/user";
 import bcrypt from 'bcrypt';
+import ActivitySchema from "./activitySchema";
 
 const UserScheme = new Schema<User>(
     {
@@ -17,8 +18,9 @@ const UserScheme = new Schema<User>(
             email: { type: String, required: true },
             name: { type: String, required: false },
             telephone: { type: Number, required: true },
-            paymentId: {type: String, required: true},
-            price: {type:Number, required:true}
+            paymentId: { type: String, required: true },
+            price: { type: Number, required: true },
+            state: { type: String, required: false },
         }],
 
     },
@@ -44,6 +46,19 @@ UserScheme.pre<User>('findOneAndUpdate', async function () {
         const salt = await bcrypt.genSalt(10);
         const hash = await bcrypt.hash(update.password, salt);
         update.password = hash;
+    }
+});
+
+UserScheme.pre<User>(['save'], async function () {
+    const updatedUser = this;
+    if (updatedUser.isModified('reservations')) {
+        const reservation = updatedUser.reservations.at(-1);
+        const activity = await ActivitySchema.findOne({ 'events._id': reservation.eventId }, { 'events.$': 1 });
+        const newBookedSeats = activity.events[0].bookedSeats + reservation.numPersons;
+        await ActivitySchema.updateOne(
+            { 'events._id': reservation.eventId },
+            { $set: { "events.$.bookedSeats": newBookedSeats } }
+        );
     }
 });
 
