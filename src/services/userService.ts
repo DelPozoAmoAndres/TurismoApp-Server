@@ -73,4 +73,15 @@ export default class UserService {
             }
         }
     }
+
+    deleteUser = async (userId: string) => {
+        try {
+            await UserScheme.deleteOne({ _id: userId });
+        } catch (error) {
+            throw {
+                status: error?.status || 500,
+                message: error?.message || 'Ha habido un error en el servidor.'
+            }
+        }
+    }
 }

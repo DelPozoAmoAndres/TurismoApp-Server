@@ -104,7 +104,7 @@ export default class AdminUserService {
                     status: 400,
                     message: 'El id no es válido'
                 }
-            const userDeleted = await UserScheme.findByIdAndDelete(userId)
+            const userDeleted = await UserScheme.deleteOne({_id:userId})
             if (!userDeleted)
                 throw {
                     status: 404,

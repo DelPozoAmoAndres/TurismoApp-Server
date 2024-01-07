@@ -8,5 +8,6 @@ router
     .get('/', userController.getOneUser)
     .put('/edit', userController.updateUser)
     .put('/edit/password', userController.changePassword)
+    .delete('/', userController.deleteUser);
 
 export default router;

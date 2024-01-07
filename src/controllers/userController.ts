@@ -49,4 +49,15 @@ export default class UserController {
             res.status(error?.status || 500).json({ message: error?.message || 'Ha habido un error en el servidor.' });
         }
     }
+
+    deleteUser = async (req: AuthenticatedRequest, res: Response) => {
+        try {
+            await this.userService.deleteUser(req.userId)
+            logger.info("[DeleteUser] Eliminación exitosa del usuario:", req.userId);
+            res.status(200).json({ message: 'Usuario eliminado' })
+        } catch (error) {
+            logger.error("[DeleteUser] Ha ocurrido un error en el servidor durante la eliminación del usuario:", req.userId, error);
+            res.status(error?.status || 500).json({ message: error?.message || 'Ha habido un error en el servidor.' });
+        }
+    }
 }

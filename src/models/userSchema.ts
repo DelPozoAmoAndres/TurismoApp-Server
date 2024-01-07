@@ -2,6 +2,7 @@ import mongoose, { Schema } from "mongoose";
 import { User } from "../customTypes/user";
 import bcrypt from 'bcrypt';
 import ActivitySchema from "./activitySchema";
+import { ReservationDoc } from "@customTypes/reservation";
 
 const UserScheme = new Schema<User>(
     {
@@ -59,6 +60,29 @@ UserScheme.pre<User>(['save'], async function () {
             { 'events._id': reservation.eventId },
             { $set: { "events.$.bookedSeats": newBookedSeats } }
         );
+    }
+});
+
+UserScheme.pre<User>('deleteOne', async function () {
+    const query = this as any; 
+    const user = await UserSchema.findOne(query);
+
+    if (user && user.reservations) {
+        const reservations = user.reservations.filter(reservation => reservation.state === 'success');
+        console.log(user.reservations);
+
+        for (let i = 0; i < reservations.length; i++) {
+            const reservation = reservations[i];
+            const activity = await ActivitySchema.findOne({ 'events._id': reservation.eventId }, { 'events.$': 1 });
+
+            if (activity && new Date(activity.events[0].date) > new Date()) {
+                const newBookedSeats = activity.events[0].bookedSeats - reservation.numPersons;
+                await ActivitySchema.updateOne(
+                    { 'events._id': reservation.eventId },
+                    { $set: { "events.$.bookedSeats": newBookedSeats } }
+                );
+            }
+        }
     }
 });
 
