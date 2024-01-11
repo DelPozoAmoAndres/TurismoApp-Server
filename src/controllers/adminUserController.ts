@@ -93,4 +93,15 @@ export default class AdminUserController {
             res.status(error?.status || 500).json({ message: error?.message || 'Ha habido un error en el servidor.' });
         }
     }
+
+    getAllReservations = async (req: Request, res: Response) => {
+        const { query } = req;
+        try {
+            const reservations = await this.reservationService.getAllReservationsAdmin();
+            res.status(200).json(reservations);
+        } catch (error) {
+            logger.error('[GetAllReservations] Ha ocurrido un error en el servidor durante la búsqueda de las reservas', error);
+            res.status(error?.status || 500).json({ message: error?.message || 'Ha habido un error en el servidor.' });
+        }
+    }
 }

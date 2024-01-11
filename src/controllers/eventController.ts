@@ -40,4 +40,15 @@ export default class EventController {
             res.status(error?.status || 500).json({ message: error?.message || 'Ha habido un error en el servidor.' });
         }
     }
+
+    deleteEvents = async (req: Request, res: Response) => {
+        const { params:{id}, body } = req;
+        try {
+            await this.eventService.deleteEvents(id,body);
+            res.status(200).json({ message: 'Eventos eliminados correctamente.' });
+        } catch (error) {
+            logger.error('[DeleteEvents] Ha ocurrido un error en el servidor durante la eliminación de los eventos.', error);
+            res.status(error?.status || 500).json({ message: error?.message || 'Ha habido un error en el servidor.' });
+        }
+    }
 }

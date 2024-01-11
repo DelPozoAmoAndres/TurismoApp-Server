@@ -1,5 +1,6 @@
 import mongoose, { QueryOptions } from "mongoose";
 import Activity from "@models/activitySchema";
+import { ActivityDoc } from "@customTypes/activity";
 
 export default class ActivityService {
     getAllActivities = async (queryOptions: QueryOptions) => {
@@ -11,10 +12,10 @@ export default class ActivityService {
                         { description: { $regex: queryOptions.searchString, $options: 'i' } },
                         { location: { $regex: queryOptions.searchString, $options: 'i' } }
                     ]
-                }:{},
-                queryOptions.duration && Number.isSafeInteger(queryOptions.duration) ? { duration: { $lt: Number(queryOptions.duration) * 60 } }:{},
-                queryOptions.petsPermited ? { petsPermited: queryOptions.petsPermited }:{},
-                queryOptions.state ? { state: queryOptions.state }:{}
+                } : {},
+                queryOptions.duration && Number.isSafeInteger(queryOptions.duration) ? { duration: { $lt: Number(queryOptions.duration) * 60 } } : {},
+                queryOptions.petsPermited ? { petsPermited: queryOptions.petsPermited } : {},
+                queryOptions.state ? { state: queryOptions.state } : {}
             ],
         };
         try {
@@ -25,7 +26,7 @@ export default class ActivityService {
                     .lt(queryOptions.price)
                 :
                 await Activity.find(query);
-            activities.forEach(activity => {activity.events =activity?.events?.filter(event => new Date(event.date) >= new Date());});
+            activities.forEach(activity => { activity.events = activity?.events?.filter(event => new Date(event.date) >= new Date() && event.state!="cancelled"); });
             return activities
         } catch (error) {
             throw {
@@ -51,8 +52,8 @@ export default class ActivityService {
                     status: 404,
                     message: 'Actividad no encontrada'
                 }
-                
-            activity.events = activity?.events?.filter(event => new Date(event.date) >= new Date()) || [];
+
+            activity.events = activity?.events?.filter(event => new Date(event.date) >= new Date() && event.state!="cancelled") || [];
 
         } catch (error) {
             throw {
@@ -61,7 +62,7 @@ export default class ActivityService {
             }
         }
 
-       
+
 
         return activity
     }
@@ -72,15 +73,24 @@ export default class ActivityService {
                 status: 400,
                 message: "El id de la actividad no es válido"
             }
-            const activity = await Activity.findById(activityId, {
-                events: { $elemMatch: { date: { $gte: new Date() } } },
-              }).exec();
-        if (!activity)
+        const today = new Date();
+        today.setHours(0, 0, 0, 0); // Asegúrate de que la comparación comience desde el inicio del día actual
+
+        const activity : ActivityDoc[] = await Activity.aggregate([
+            { $match: { _id: new mongoose.Types.ObjectId(activityId) } },
+            { $unwind: "$events" },
+            { $match: { "events.date": { $gte: today } } },
+            { $group: { _id: "$_id", events: { $push: "$events" } } }
+        ]).exec();
+
+        console.log(activity[0]);
+
+        if (!activity[0])
             throw {
                 status: 404,
                 message: "No se ha encontrado la actividad"
             }
-        const events = activity.events
+        const events = activity[0].events.filter((event) => event.state !== "cancelled");
         if (!events || events.length === 0)
             throw {
                 status: 404,

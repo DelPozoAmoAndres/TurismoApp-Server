@@ -1,7 +1,7 @@
 import mongoose from "mongoose"
 import { ReservationDoc } from "@customTypes/reservation";
 import User from "@models/userSchema";
-import StripeService  from "@services/stripeService"
+import StripeService from "@services/stripeService"
 import { ActivityDoc } from "@customTypes/activity";
 import Activity from "@models/activitySchema";
 import PaymentService from "./paymentService";
@@ -65,11 +65,30 @@ export default class ReservationService {
         }
     }
 
+    getAllReservationsAdmin = async () => {
+        try {
+            const users = await User.find({ reservations: { $exists: true, $not: { $size: 0 } } });
+            if (!users || users.length == 0) {
+                throw {
+                    status: 404,
+                    message: 'No hay reservas'
+                };
+            }
+            return users.map((user) => user.reservations.flat()).flat();
+        } catch (error) {
+            throw {
+                status: error.status || 500,
+                message: error.message || 'Ha habido un error en el servidor.'
+            };
+        }
+    }
+
     createReservation = async (reservation: ReservationDoc, intentId: string, userId: string,) => {
         try {
             const user = await User.findById(userId);
             reservation.paymentId = intentId;
             user.reservations ? user.reservations.push(reservation) : user.reservations = [reservation];
+            console.log(user)
             if (user.validateSync())
                 throw {
                     status: 400,
@@ -130,11 +149,11 @@ export default class ReservationService {
         reservationMap.activity = activityFinal
         return reservationMap;
     }
-    
-    private groupReservations = async (reservations:any) => {
+
+    private groupReservations = async (reservations: any) => {
         const reservationGroups: any[] = [];
         let currentGroup: any = null;
-    
+
         // Agrupar las reservas por fecha con una diferencia máxima de 5 días
         reservations.forEach((reservation: any) => {
             if (!currentGroup || Math.abs(reservation.event.date.getTime() - currentGroup.dateTo.getTime()) > 3 * 24 * 60 * 60 * 1000) {

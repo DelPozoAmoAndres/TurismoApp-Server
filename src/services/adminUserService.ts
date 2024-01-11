@@ -124,6 +124,7 @@ export default class AdminUserService {
                     status: 400,
                     message: 'El id no es válido'
                 }
+                console.log(changes)
             const userUpdated = await UserScheme.findByIdAndUpdate(userId, changes, { new: true, runValidators: true })
             if (!userUpdated)
                 throw {

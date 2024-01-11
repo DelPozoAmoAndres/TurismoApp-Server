@@ -8,5 +8,6 @@ router
     .get("/:id", eventController.getOneEvent)
     .get("/:id/participants", eventController.getParticipants)
     .get("/list/:id", eventController.getWorkerEvents)
+    .delete("/:id/recurrence", eventController.deleteEvents)
 
 export default router

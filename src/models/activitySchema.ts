@@ -13,6 +13,7 @@ const activitySchema: Schema = new Schema({
     date: { type: Date, required: true },
     language: { type: String, required: true },
     price: { type: Number, required: true },
+    state: { type: String, required: false },
   }],
   reviews: [{
     score: { type: Number, required: true },

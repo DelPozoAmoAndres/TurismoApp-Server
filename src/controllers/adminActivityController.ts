@@ -1,12 +1,15 @@
 import { Response, Request } from "express"
 import { logger } from "@utils/logger"
 import AdminActivityService from "@services/adminActivityService"
+import EventService from "@services/eventService";
 
 export default class AdminActivityController {
     private adminActivityService: AdminActivityService;
+    private eventService: EventService;
 
-    constructor(adminActivityService?: AdminActivityService) {
+    constructor(adminActivityService?: AdminActivityService, eventService?: EventService) {
         this.adminActivityService = adminActivityService || new AdminActivityService();
+        this.eventService = eventService || new EventService();
     }
 
     addActivity = async (req: Request, res: Response) => {
@@ -88,7 +91,7 @@ export default class AdminActivityController {
             }
         }
 
-        const { language, price, seats, guide, date } = event;
+        const { language, price, seats, guide, date,bookedSeats } = event;
         let events: any = [];
 
         switch (repeatInfo?.repeatType) {
@@ -98,7 +101,7 @@ export default class AdminActivityController {
                 days.forEach((day) => {
                     let date = new Date(day);
                     date.setHours(time[0], time[1])
-                    events.push({ seats, date, price, language, guide })
+                    events.push({ seats, date, price, language, guide,bookedSeats })
                 })
                 break;
             }
@@ -110,14 +113,14 @@ export default class AdminActivityController {
                     if (repeatInfo.repeatDays.includes(currDate.getDay())) {
                         let date = new Date(currDate);
                         date.setHours(time[0], time[1])
-                        events.push({ seats, date, price, language, guide })
+                        events.push({ seats, date, price, language, guide,bookedSeats })
                     }
                     currDate.setDate(currDate.getDate() + 1);
                 }
                 break;
             }
             default:
-                events.push({ seats, date, price, language, guide })
+                events.push({ seats, date, price, language, guide, bookedSeats })
         }
 
         try {
@@ -125,6 +128,17 @@ export default class AdminActivityController {
             return res.status(200).json({ message: 'Eventos añadidos con exito' });
         } catch (error) {
             logger.error("[AddEvent] Ha ocurrido un error en el servidor durante la creación de un evento", error);
+            res.status(error?.status || 500).json({ message: error?.message || 'Ha habido un error en el servidor.' });
+        }
+    }
+
+    getEvents = async (req: Request, res: Response) => {
+        const { query: { search, filters } } = req
+        try {
+            const events = await this.eventService.getEvents(search as string, filters as Record<string, unknown>)
+            res.status(200).json(events);
+        } catch (error) {
+            logger.error("[GetEvents] Ha ocurrido un error en el servidor durante la obtención de los eventos", error);
             res.status(error?.status || 500).json({ message: error?.message || 'Ha habido un error en el servidor.' });
         }
     }

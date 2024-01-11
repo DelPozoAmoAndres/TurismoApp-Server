@@ -6,6 +6,7 @@ export class Event{
     price: number;
     language: string;
     guide: string;
+    state?: string;
 
     constructor(
         seats: number,
