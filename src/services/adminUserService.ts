@@ -1,14 +1,20 @@
 import UserScheme from "@models/userSchema";
 import { Role, User } from "@customTypes/user";
-import mongoose,{ QueryOptions} from "mongoose";
+import mongoose, { QueryOptions, get } from "mongoose";
 import { ReservationDoc } from "@customTypes/reservation";
-import ReservationService  from "@services/reservationService"
+import ReservationService from "@services/reservationService"
+import ActivitySchema from "@models/activitySchema";
+import { ActivityDoc } from "@customTypes/activity";
+import { Event } from "@customTypes/event";
+import EventService from "./eventService";
 
 export default class AdminUserService {
     private reservationService: ReservationService;
+    private eventService: EventService;
 
-    constructor(reservationService?: ReservationService) {
+    constructor(reservationService?: ReservationService, eventService?: EventService) {
         this.reservationService = reservationService || new ReservationService();
+        this.eventService = eventService || new EventService();
     }
 
     addUser = async (newUser: User) => {
@@ -104,7 +110,7 @@ export default class AdminUserService {
                     status: 400,
                     message: 'El id no es válido'
                 }
-            const userDeleted = await UserScheme.deleteOne({_id:userId})
+            const userDeleted = await UserScheme.deleteOne({ _id: userId })
             if (!userDeleted)
                 throw {
                     status: 404,
@@ -124,13 +130,110 @@ export default class AdminUserService {
                     status: 400,
                     message: 'El id no es válido'
                 }
-                console.log(changes)
+            console.log(changes)
             const userUpdated = await UserScheme.findByIdAndUpdate(userId, changes, { new: true, runValidators: true })
             if (!userUpdated)
                 throw {
                     status: 404,
                     message: 'Usuario no encontrado'
                 }
+        } catch (error) {
+            throw {
+                status: error?.status || 500,
+                message: error?.message || 'Ha habido un error en el servidor.'
+            }
+        }
+    }
+
+    getWorkers = async (queryOptions: QueryOptions) => {
+        const MARGIN_BETWEEN_EVENTS = 2;
+        try {
+            let { repeatType, repeatDays, repeatStartDate, repeatEndDate, time, date } = queryOptions;
+            if (!repeatType && !date
+                || repeatType == "days" && !repeatDays
+                || repeatType == "range" && (!repeatDays || !repeatStartDate || !repeatEndDate)) {
+                throw {
+                    status: 400,
+                    message: "Faltan parámetros"
+                }
+            }
+            const workers = await UserScheme.find({ role: Role.guía });
+            if (!workers)
+                throw {
+                    status: 404,
+                    message: 'No se encontraron guias disponibles'
+                }
+
+            if(date){
+                date=date.replace("%3A",":");
+            }
+            if(time){
+                time=time.replace("%3A",":");
+            }
+            if(repeatType=="days"){
+                repeatDays = repeatDays.split(',')
+            }
+
+            let result : User[]=[];
+            for (const worker of workers) {
+                const events: Event[] = await this.eventService.getWorkerEvents(worker._id);
+                let workerIsAvailable = true;
+                // Comprobar contra eventos existentes
+                for (const event of events) {
+                    const activity = await ActivitySchema.findOne({ "events._id": event.id });
+                    const eventStartTime = new Date(event.date);
+                    const eventEndTime = new Date(eventStartTime.getTime() + activity.duration * 60000);
+
+                    if (repeatType=="none" && date) {
+                        const proposedStartTime = new Date(date);
+                        proposedStartTime.setHours(proposedStartTime.getHours() - MARGIN_BETWEEN_EVENTS);
+                        const proposedEndTime = new Date(proposedStartTime.getTime() + activity.duration * 60000);
+                        proposedEndTime.setHours(proposedEndTime.getHours() + MARGIN_BETWEEN_EVENTS);
+                        
+                        if(!(eventEndTime<proposedStartTime || proposedEndTime<eventStartTime)){
+                            workerIsAvailable=false;
+                            break;
+                        }
+                    } else if (repeatType === 'range' && time) {
+                        for (let day = new Date(repeatStartDate); day <= new Date(repeatEndDate); day.setDate(day.getDate() + 1)) {
+                            const dayOfWeek = day.getDay();
+                            day.setHours(time.split(':')[0], time.split(':')[1]);
+                            
+                            if (repeatDays.includes(dayOfWeek)) {
+                                const proposedStartTime = day;
+                                proposedStartTime.setHours(proposedStartTime.getHours() - MARGIN_BETWEEN_EVENTS);
+                                const proposedEndTime = new Date(proposedStartTime.getTime() + activity.duration * 60000);
+                                proposedEndTime.setHours(proposedEndTime.getHours() + MARGIN_BETWEEN_EVENTS);
+                                
+
+                                if(!(eventEndTime<proposedStartTime || proposedEndTime<eventStartTime)){
+                                    workerIsAvailable=false;
+                                    break;
+                                }
+                            }
+                        }
+                    } else if (repeatType === 'days' && time) {
+                        for (const day of repeatDays) {
+                            let proposedStartTime = new Date(day);
+                            proposedStartTime.setHours(time.split(':')[0], time.split(':')[1]);
+                            proposedStartTime.setHours(proposedStartTime.getHours() - MARGIN_BETWEEN_EVENTS);
+                            const proposedEndTime = new Date(proposedStartTime.getTime() + activity.duration * 60000);
+                            proposedEndTime.setHours(proposedEndTime.getHours() + MARGIN_BETWEEN_EVENTS);
+
+                            console.log(proposedStartTime,proposedEndTime,eventStartTime,eventEndTime);
+                                console.log(eventEndTime<proposedStartTime,proposedEndTime<eventEndTime);
+                            if(!(eventEndTime<proposedStartTime || proposedEndTime<eventStartTime)){
+                                workerIsAvailable=false;
+                                break;
+                            }
+                        }
+                    }
+                }
+                if(workerIsAvailable){
+                    result.push(worker);
+                }
+            };
+            return result;
         } catch (error) {
             throw {
                 status: error?.status || 500,

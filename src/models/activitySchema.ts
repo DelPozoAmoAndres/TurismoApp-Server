@@ -19,6 +19,7 @@ const activitySchema: Schema = new Schema({
     score: { type: Number, required: true },
     comment: { type: String, required: false },
     author: { type: String, required: true },
+    reservationId: { type: String, required: true },
   }],
   accesibility: { type: String, required: true },
   petsPermited: { type: Boolean, required: true },

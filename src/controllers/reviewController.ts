@@ -9,32 +9,49 @@ export default class ReviewController {
         this.reviewService = reviewService || new ReviewService();
     }
 
-    getAllReviewsByActivityId = async (req: Request, res: Response) => {
+    getReviewFromReservation = async (req: Request, res: Response) => {
         const { id } = req.params;
         try {
-            const updatedReviews = await this.reviewService.getAllReviewsByActivityId(id);
-            res.status(200).json(updatedReviews);
+            const review = await this.reviewService.getReviewFromReservation(id);
+            res.status(200).json(review);
         } catch (error) {
-            logger.error(`[GetAllReviewsByActivityId] ${error.message}`)
+            logger.error(`[GetReviewFromReservation] ${error.message}`)
             res.status(error.status || 500).json({ message: error.message || 'Ha habido un error en el servidor.' });
         }
-
     }
+
     addReview = async (req: AuthenticatedRequest, res: Response) => {
-        const { body: { review }, userId, params: { id } } = req
-        if (!review) {
+        const { body, userId, params: { id } } = req
+        if (!body) {
             logger.error('[AddReview] No se ha recibido la review.')
             res.status(400).json({ message: 'No se ha recibido la review.' });
             return;
         }
         try {
-            await this.reviewService.addReview(id, review, userId);
+            await this.reviewService.addReview(id, body, userId);
             res.status(200).json({ message: "Review añadida correctamente" });
         } catch (error) {
             logger.error(`[AddReview] ${error.message}`)
             res.status(error.status || 500).json({ message: error.message || 'Ha habido un error en el servidor.' });
         }
     }
+
+    editReview = async (req: AuthenticatedRequest, res: Response) => {
+        const { body, params: { id }, userId } = req
+        if (!body) {
+            logger.error('[EditReview] No se ha recibido la review.')
+            res.status(400).json({ message: 'No se ha recibido la review.' });
+            return;
+        }
+        try {
+            await this.reviewService.editReview(id, body, userId);
+            res.status(200).json({ message: "Review editada correctamente" });
+        } catch (error) {
+            logger.error(`[EditReview] ${error.message}`)
+            res.status(error.status || 500).json({ message: error.message || 'Ha habido un error en el servidor.' });
+        }
+    }
+
     deleteReview = async (req: AuthenticatedRequest, res: Response) => {
         const { userId, params: { id } } = req
         try {

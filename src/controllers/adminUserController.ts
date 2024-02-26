@@ -104,4 +104,14 @@ export default class AdminUserController {
             res.status(error?.status || 500).json({ message: error?.message || 'Ha habido un error en el servidor.' });
         }
     }
+    getWorkers = async (req: Request, res: Response) => {
+        const { query } = req;
+        try {
+            const workers = await this.adminUserService.getWorkers(query);
+            res.status(200).json(workers);
+        } catch (error) {
+            logger.error('[GetWorkers] Ha ocurrido un error en el servidor durante la búsqueda de los trabajadores', error);
+            res.status(error?.status || 500).json({ message: error?.message || 'Ha habido un error en el servidor.' });
+        }
+    }
 }

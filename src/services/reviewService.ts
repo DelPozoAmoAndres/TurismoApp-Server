@@ -4,33 +4,33 @@ import Activity from "@models/activitySchema";
 import User from "@models/userSchema";
 
 export default class ReviewService {
-    getAllReviewsByActivityId = async (activityId: string) => {
-        if (mongo.ObjectId.isValid(activityId))
-            throw {
-                status: 400,
-                message: "El id de la actividad no es válido"
-            }
+
+    getReviewFromReservation = async (reservationId: string) => {
         try {
-            const activity = await Activity.findById(activityId);
-            if (!activity.reviews || activity.reviews.length === 0)
+            if (!mongo.ObjectId.isValid(reservationId))
+                throw {
+                    status: 400,
+                    message: "El id de la reserva no es válido"
+                }
+            const activity = await Activity.findOne({ 'reviews.reservationId': reservationId })
+            if (!activity)
                 throw {
                     status: 404,
-                    message: "No hay comentarios para esta actividad"
+                    message: "No hay comentario asociado a esta reserva"
                 }
-
-            const updatedReviews = await Promise.all(activity.reviews.map(async (review) => {
-                const user = await User.findById(review.author);
-                const { score, comment, author, _id } = review;
-                return {
-                    _id,
-                    score,
-                    comment,
-                    author,
-                    authorName: user.name,
-                    authorImage: ''
-                }
-            }))
-            return updatedReviews;
+            let review = activity.reviews.find((review) => review.reservationId === reservationId)
+            const user = await User.findById(review.author);
+            const { score, comment, author, _id } = review;
+            return {
+                _id,
+                score,
+                comment,
+                author,
+                authorName: user.name,
+                authorImage: '',
+                activityId: activity._id,
+                reservationId: review.reservationId
+            }
         } catch (error) {
             throw {
                 status: error.status || 500,
@@ -38,8 +38,9 @@ export default class ReviewService {
             }
         }
     }
+
     addReview = async (activityId: string, review: Review, userId: string) => {
-        if (mongo.ObjectId.isValid(activityId))
+        if (!mongo.ObjectId.isValid(activityId))
             throw {
                 status: 400,
                 message: "El id de la actividad no es válido"
@@ -53,7 +54,8 @@ export default class ReviewService {
                 }
 
             review.author = userId;
-            activity?.reviews ? activity.reviews.push(review) : [review]
+            activity?.reviews ? activity.reviews.push(review) : activity.reviews = [review]
+            console.log(activity.reviews,review,userId)
             if (activity.validateSync())
                 throw {
                     status: 400,
@@ -68,8 +70,32 @@ export default class ReviewService {
             }
         }
     }
+    editReview = async (reviewId: string, review: Review, userId: string) => {
+        if (!mongo.ObjectId.isValid(reviewId))
+            throw {
+                status: 400,
+                message: "El id del comentario no es válido"
+            }
+        try {
+            const activity = await Activity.findOne({ 'reviews.author': userId, 'reviews._id': reviewId })
+            if (!activity)
+                throw {
+                    status: 404,
+                    message: "El comentario no existe"
+                }
+            const reviewIndex = activity.reviews.findIndex((review) => String(review._id) === reviewId)
+            activity.reviews[reviewIndex] = review;
+            activity.save();
+        } catch (error) {
+            throw {
+                status: error.status || 500,
+                message: error.message || 'Ha habido un error en el servidor.'
+            }
+        }
+    }
+
     deleteReview = async (reviewId: string, userId: string) => {
-        if (mongo.ObjectId.isValid(reviewId))
+        if (!mongo.ObjectId.isValid(reviewId))
             throw {
                 status: 400,
                 message: "El id del comentario no es válido"

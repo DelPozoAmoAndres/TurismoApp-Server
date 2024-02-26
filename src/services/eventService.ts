@@ -73,7 +73,8 @@ export default class EventService {
 
         let events;
         try {
-            events = await ActivitySchema.find({ "events.guide": workerId });
+            //devolver solo aquellos eventos cuando el trabajador es el guía
+            events = await ActivitySchema.find({ "events.guide": workerId })
             if (!events)
                 throw {
                     status: 404,
@@ -86,7 +87,7 @@ export default class EventService {
                 message: error?.message || 'Ha habido un error en el servidor.'
             }
         }
-        return events.flatMap((event: any) => event.events.filter((e: any) => e.state !== "cancelled"));
+        return events.flatMap((event: any) => event.events.filter((e: Event) => e.guide === workerId.toString() && e.state !== "cancelled"));
     }
 
     getEvents = async (search: string, filters: Record<string, unknown>) => {

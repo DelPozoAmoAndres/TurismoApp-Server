@@ -41,6 +41,16 @@ export default class ActivityController {
         }
     }
 
+    getActivityFromEvent = async (req: Request, res: Response) => {
+        try {
+            const activity = await this.activityService.getActivityFromEvent(req.params.id)
+            res.status(200).json(activity);
+        } catch (error) {
+            logger.error("[GetActivityFromEvent] Ha ocurrido un error en el servidor durante la obtencion los datos de la actividad:", req.params.id, error);
+            res.status(error?.status || 500).json({ message: error?.message || 'Ha habido un error en el servidor.' });
+        }
+    }
+
     getEvents = async (req: Request, res: Response) => {
         const { id } = req.params;
         try {
@@ -50,5 +60,17 @@ export default class ActivityController {
             logger.error('[GetEventsByActivityId] Ha ocurrido un error en el servidor durante la obtención de los eventos.', error);
             res.status(error?.status || 500).json({ message: error?.message || 'Ha habido un error en el servidor.' });
         }
+    }
+
+    getAllReviewsByActivityId = async (req: Request, res: Response) => {
+        const { id } = req.params;
+        try {
+            const updatedReviews = await this.activityService.getAllReviewsByActivityId(id);
+            res.status(200).json(updatedReviews);
+        } catch (error) {
+            logger.error(`[GetAllReviewsByActivityId] ${error.message}`)
+            res.status(error.status || 500).json({ message: error.message || 'Ha habido un error en el servidor.' });
+        }
+
     }
 }

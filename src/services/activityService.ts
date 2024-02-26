@@ -1,6 +1,7 @@
 import mongoose, { QueryOptions } from "mongoose";
 import Activity from "@models/activitySchema";
-import { ActivityDoc } from "@customTypes/activity";
+import { ActivityDoc, ActivityState } from "@customTypes/activity";
+import User from "@models/userSchema";
 
 export default class ActivityService {
     getAllActivities = async (queryOptions: QueryOptions) => {
@@ -27,7 +28,7 @@ export default class ActivityService {
                 :
                 await Activity.find(query);
             activities.forEach(activity => { activity.events = activity?.events?.filter(event => new Date(event.date) >= new Date() && event.state!="cancelled"); });
-            return activities
+            return activities.filter(activity => activity.state !== ActivityState.cancelada);
         } catch (error) {
             throw {
                 status: error?.status || 500,
@@ -67,6 +68,34 @@ export default class ActivityService {
         return activity
     }
 
+    getActivityFromEvent = async (eventId: string) => {
+        if (!mongoose.Types.ObjectId.isValid(eventId))
+            throw {
+                status: 400,
+                message: 'El identificador del evento no es válido'
+            }
+
+        let activity;
+        try {
+            activity = await Activity.findOne({ "events._id": eventId });
+
+            if (!activity)
+                throw {
+                    status: 404,
+                    message: 'Evento no encontrado'
+                }
+
+            activity.events = activity?.events?.filter(event => new Date(event.date) >= new Date() && event.state!="cancelled") || [];
+
+        } catch (error) {
+            throw {
+                status: error?.status || 500,
+                message: error?.message || 'Ha habido un error en el servidor.'
+            }
+        }
+        return activity
+    }
+
     getEvents = async (activityId: string) => {
         if (!mongoose.Types.ObjectId.isValid(activityId))
             throw {
@@ -97,5 +126,42 @@ export default class ActivityService {
                 message: "No hay eventos para esta actividad"
             }
         return events
+    }
+
+    getAllReviewsByActivityId = async (activityId: string) => {
+        if (!mongoose.Types.ObjectId.isValid(activityId))
+            throw {
+                status: 400,
+                message: "El id de la actividad no es válido"
+            }
+        try {
+            const activity = await Activity.findById(activityId);
+            if (!activity.reviews || activity.reviews.length === 0)
+                throw {
+                    status: 404,
+                    message: "No hay comentarios para esta actividad"
+                }
+
+            const updatedReviews = await Promise.all(activity.reviews.map(async (review) => {
+                const user = await User.findById(review.author);
+                const { score, comment, author, _id } = review;
+                return {
+                    _id,
+                    score,
+                    comment,
+                    author,
+                    authorName: user.name,
+                    authorImage: '',
+                    activityId: activity._id,
+                    reservationId: review.reservationId
+                }
+            }))
+            return updatedReviews;
+        } catch (error) {
+            throw {
+                status: error.status || 500,
+                message: error.message || 'Ha habido un error en el servidor.'
+            }
+        }
     }
 }
