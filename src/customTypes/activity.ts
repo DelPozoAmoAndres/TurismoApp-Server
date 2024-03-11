@@ -12,8 +12,10 @@ export interface ActivityDoc extends Document {
   reviews?: Review[];
   accesibility: string;
   petsPermited: boolean;
+  category:ActivityCategory;
   state: ActivityState;
   images:any[]
 }
 
 export enum ActivityState { "abierta", "parada temporalmente", "cancelada" }
+export enum ActivityCategory { "cultural", "deportiva", "gastronómica", "naturaleza", "nocturna", "religiosa", "social"}

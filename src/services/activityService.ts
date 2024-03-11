@@ -1,6 +1,6 @@
 import mongoose, { QueryOptions } from "mongoose";
 import Activity from "@models/activitySchema";
-import { ActivityDoc, ActivityState } from "@customTypes/activity";
+import { ActivityDoc } from "@customTypes/activity";
 import User from "@models/userSchema";
 
 export default class ActivityService {
@@ -16,9 +16,10 @@ export default class ActivityService {
                 } : {},
                 queryOptions.duration && Number.isSafeInteger(queryOptions.duration) ? { duration: { $lt: Number(queryOptions.duration) * 60 } } : {},
                 queryOptions.petsPermited ? { petsPermited: queryOptions.petsPermited } : {},
-                queryOptions.state ? { state: queryOptions.state } : {}
+                queryOptions.state ? { state: queryOptions.state } : {state: { $ne: 'canceled' }}
             ],
         };
+        console.log(query)
         try {
             const activities = queryOptions.price && Number.isSafeInteger(queryOptions.price) ?
                 await Activity.find(query)
@@ -28,7 +29,7 @@ export default class ActivityService {
                 :
                 await Activity.find(query);
             activities.forEach(activity => { activity.events = activity?.events?.filter(event => new Date(event.date) >= new Date() && event.state!="cancelled"); });
-            return activities.filter(activity => activity.state !== ActivityState.cancelada);
+            return activities;
         } catch (error) {
             throw {
                 status: error?.status || 500,
@@ -112,9 +113,7 @@ export default class ActivityService {
             { $group: { _id: "$_id", events: { $push: "$events" } } }
         ]).exec();
 
-        console.log(activity[0]);
-
-        if (!activity[0])
+        if (!activity || activity.length==0)
             throw {
                 status: 404,
                 message: "No se ha encontrado la actividad"

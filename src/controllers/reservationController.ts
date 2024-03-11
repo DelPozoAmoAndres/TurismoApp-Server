@@ -2,6 +2,7 @@ import { Response } from "express";
 import { AuthenticatedRequest } from "@customTypes/autenticatedRequest";
 import { logger } from "@utils/logger";
 import ReservationService from "@services/reservationService";
+import { socket } from "@app";
 
 export default class ReservationController {
     private reservationService: ReservationService;
@@ -41,6 +42,7 @@ export default class ReservationController {
         }
         try {
             await this.reservationService.createReservation(reservation, intentId, userId);
+            socket.emit('reservation', req.body);
             res.status(200).json({ mesagge: "Reserva creada correctamente" });
         } catch (error) {
             logger.error('[CreateReservation] Ha ocurrido un error en el servidor durante la creación de la reserva.', error);
@@ -51,6 +53,7 @@ export default class ReservationController {
         const { params: {id}, userId } = req;
         try {
             await this.reservationService.cancelReservation(id, userId);
+            socket.emit('update', req.body);
             res.status(200).json({ mesagge: "Reserva cancelada correctamente" });
         } catch (error) {
             logger.error('[CancelReservation] Ha ocurrido un error en el servidor durante la cancelación de la reserva.', error);

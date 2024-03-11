@@ -2,19 +2,7 @@ jest.mock('@models/activitySchema');
 import ActivityScheme from "@models/activitySchema";
 const mockedActivity = ActivityScheme as jest.Mocked<typeof ActivityScheme>;
 
-jest.mock('mongoose', () => {
-    const actualMongoose = jest.requireActual('mongoose');
-    return {
-      ...actualMongoose, 
-      Types: {
-        ObjectId: {
-          isValid: jest.fn() 
-        }
-      }
-    };
-  });
 import mongoose from 'mongoose';
-const mockedMongoose = mongoose as jest.Mocked<typeof mongoose>;
 
 import ActivityService from "@services/activityService";
 import { ActivityDoc, ActivityState } from "@customTypes/activity";
@@ -100,7 +88,7 @@ describe('Get one activity', () => {
     describe('when the activity is found', () => {
         const activity = { name: "", description: "", location: "", duration: 0, petsPermited: false, state: "" };
         beforeAll(() => {
-            mockedMongoose.Types.ObjectId.isValid = jest.fn().mockReturnValue(true);
+            jest.spyOn(mongoose.Types.ObjectId, 'isValid').mockReturnValue(true);
             mockedActivity.findById = jest.fn().mockResolvedValue(activity);
         });
         test('should respond with a activity', async () => {
@@ -111,7 +99,7 @@ describe('Get one activity', () => {
 
     describe('when the activity id is not valid', () => {
         beforeAll(() => {
-            mockedMongoose.Types.ObjectId.isValid = jest.fn().mockReturnValue(false);
+            jest.spyOn(mongoose.Types.ObjectId, 'isValid').mockReturnValue(false);
         });
 
         test('should throw an error', async () => {
@@ -122,7 +110,7 @@ describe('Get one activity', () => {
 
     describe('when the activity is not found', () => {
         beforeAll(() => {
-            mockedMongoose.Types.ObjectId.isValid = jest.fn().mockReturnValue(true);
+            jest.spyOn(mongoose.Types.ObjectId, 'isValid').mockReturnValue(true);
             mockedActivity.findById = jest.fn().mockResolvedValue(null);
         });
 
@@ -134,7 +122,7 @@ describe('Get one activity', () => {
 
     describe('when there is an error', () => {
         beforeAll(() => {
-            mockedMongoose.Types.ObjectId.isValid = jest.fn().mockReturnValue(true);
+            jest.spyOn(mongoose.Types.ObjectId, 'isValid').mockReturnValue(true);
             mockedActivity.findById = jest.fn().mockRejectedValue(new Error());
         });
 
@@ -147,8 +135,10 @@ describe('Get one activity', () => {
 
 describe('Get events by activity id', () => {
     let activityService: ActivityService;
+    let activityId: string;
     beforeEach(() => {
         activityService = new ActivityService();
+        activityId = '123456789012';
     });
 
     afterEach(() => {
@@ -168,14 +158,14 @@ describe('Get events by activity id', () => {
             events: [new Event(10, new Date(), 10, 'English', 'John Doe'), new Event(10, new Date(), 10, 'English', 'John Doe')]
           } as ActivityDoc;
         beforeAll(()=>{
-            mockedMongoose.Types.ObjectId.isValid = jest.fn().mockReturnValue(true);
-            mockedActivity.findById.mockReturnValue({
-                exec: jest.fn().mockResolvedValue(activity),
-            }as any);
+            // jest.spyOn(mongoose.Types.ObjectId, 'isValid').mockReturnValue(true);
+            mockedActivity.aggregate.mockReturnValue({
+                exec: jest.fn().mockResolvedValue([activity]),
+            } as any);
         });
 
         test('Should return the events', async () => {
-            const events = await activityService.getEvents('1234');
+            const events = await activityService.getEvents(activityId);
             expect(events).toEqual(activity.events);
         });
     });
@@ -193,14 +183,14 @@ describe('Get events by activity id', () => {
             events: []
           } as ActivityDoc;
         beforeAll(()=>{
-            mockedMongoose.Types.ObjectId.isValid = jest.fn().mockReturnValue(true);
-            mockedActivity.findById.mockReturnValue({
-                exec: jest.fn().mockResolvedValue(activity),
+            jest.spyOn(mongoose.Types.ObjectId, 'isValid').mockReturnValue(true);
+            mockedActivity.aggregate.mockReturnValue({
+                exec: jest.fn().mockResolvedValue([activity]),
             }as any);
         });
 
         test('Should return an error', async () => {
-            await expect(activityService.getEvents('1234')).rejects.toEqual({
+            await expect(activityService.getEvents(activityId)).rejects.toEqual({
                 status: 404,
                 message: "No hay eventos para esta actividad"
             });
@@ -209,14 +199,14 @@ describe('Get events by activity id', () => {
 
     describe('When the activity does not exist', () => {
         beforeAll(()=>{
-            mockedMongoose.Types.ObjectId.isValid = jest.fn().mockReturnValue(true);
-            mockedActivity.findById.mockReturnValue({
+            jest.spyOn(mongoose.Types.ObjectId, 'isValid').mockReturnValue(true);
+            mockedActivity.aggregate.mockReturnValue({
                 exec: jest.fn().mockResolvedValue(null),
             }as any);
         });
 
         test('Should return an error', async () => {
-            await expect(activityService.getEvents('1234')).rejects.toEqual({
+            await expect(activityService.getEvents(activityId)).rejects.toEqual({
                 status: 404,
                 message: "No se ha encontrado la actividad"
             });
@@ -225,10 +215,10 @@ describe('Get events by activity id', () => {
 
     describe('When the activity id is not valid', () => {
         beforeAll(()=>{
-            mockedMongoose.Types.ObjectId.isValid = jest.fn().mockReturnValue(false);
+            jest.spyOn(mongoose.Types.ObjectId, 'isValid').mockReturnValue(false);
         });
         test('Should return an error', async () => {
-            await expect(activityService.getEvents('1234')).rejects.toEqual({
+            await expect(activityService.getEvents(activityId)).rejects.toEqual({
                 status: 400,
                 message: "El id de la actividad no es válido"
             });

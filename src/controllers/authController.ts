@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import { Role } from '@customTypes/user';
 import { logger } from '@utils/logger';
 import AuthService from '@services/authService';
+import { socket } from '@app';
 
 export default class AuthController {
     private authService: AuthService;
@@ -47,6 +48,7 @@ export default class AuthController {
             }
 
             await this.authService.register(newUser);
+            socket.emit('update', req.body);
             res.status(200).json({ message: 'Usuario registrado correctamente.' });
         } catch (error) {
             logger.error(error);

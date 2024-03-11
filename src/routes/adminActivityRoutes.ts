@@ -11,5 +11,6 @@ router
     .post('/:id/events',adminActivityController.addEvents) 
     .delete('/:activityId/review/:reviewId',adminActivityController.deleteReview)
     .get('/event/list',adminActivityController.getEvents)
+    .get('/list',adminActivityController.getAllActivities)
 
 export default router

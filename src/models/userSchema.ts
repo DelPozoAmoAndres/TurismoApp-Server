@@ -22,6 +22,7 @@ const UserScheme = new Schema<User>(
             paymentId: { type: String, required: true },
             price: { type: Number, required: true },
             state: { type: String, required: false },
+            date:{type: Date, required: true},
         }],
 
     },

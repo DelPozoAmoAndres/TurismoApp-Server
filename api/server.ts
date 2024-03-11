@@ -3,7 +3,8 @@ if (__filename.endsWith('.js')) {
     require('module-alias/register');
 }
 
-import app from "@app";
+import app,{server,socket} from "@app";
+import { Socket } from "engine.io";
 const {logger}  = require("@utils/logger");
 
 //Database
@@ -17,9 +18,16 @@ mongoose.connect(process.env.MONGODB_URI, {
     logger.error('Error al conectar a MongoDB:', error);
 });
 
+socket.on('connection', (socket) => {
+    logger.info('Usuario conectado');
+    socket.on('disconnect', () => {
+        logger.info('Usuario desconectado');
+    });
+});
+
 // Iniciar servidor
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
+server.listen(PORT, () => {
     logger.info(`Servidor iniciado en el puerto ${PORT}`);
 });
 

@@ -3,6 +3,7 @@ import { logger } from '@utils/logger';
 import PaymentService from '@services/paymentService';
 import StripeService from '@services/stripeService';
 import { PaymentIntent } from '@customTypes/payment';
+import { socket } from '@app';
 
 export default class PaymentController {
     private paymentService: PaymentService;

@@ -3,6 +3,7 @@ import { AuthenticatedRequest } from '@customTypes/autenticatedRequest';
 import { logger } from '@utils/logger';
 import { User } from '@customTypes/user';
 import UserService from '@services/userService';
+import { socket } from '@app';
 
 export default class UserController {
 
@@ -27,6 +28,7 @@ export default class UserController {
         try {
             await this.userService.updateUser(req.userId,req.body)
             logger.info("[UpdateUser] Actualización exitosa de los datos del usuario:", req.userId)
+            socket.emit('update', req.body);
             res.status(200).json({ message: 'Usuario actualizado' })
         } catch (error) {
             logger.error("[UpdateUser] Ha ocurrido un error en el servidor durante la actualizacón de los datos del usuario:", req.userId, error);
@@ -54,6 +56,7 @@ export default class UserController {
         try {
             await this.userService.deleteUser(req.userId)
             logger.info("[DeleteUser] Eliminación exitosa del usuario:", req.userId);
+            socket.emit('update', req.body);
             res.status(200).json({ message: 'Usuario eliminado' })
         } catch (error) {
             logger.error("[DeleteUser] Ha ocurrido un error en el servidor durante la eliminación del usuario:", req.userId, error);

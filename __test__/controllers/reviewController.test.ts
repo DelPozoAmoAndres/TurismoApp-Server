@@ -11,58 +11,8 @@ const mockedTokenService = TokenService as jest.Mocked<typeof TokenService>;
 
 const baseUrl = '/api/reviews';
 
-describe('GET /activity/:id/reviews', () => {
-    const url = baseUrl + '/activity/1/reviews';
-
-    beforeAll(() => {
-        mockedTokenService.prototype.getUserId = jest.fn().mockResolvedValue(true);
-    });
-
-    afterAll(() => {
-        jest.resetAllMocks();
-    });
-
-    describe('when the activity exists', () => {
-        const reviews = [{ name: "test" }];
-        beforeAll(() => {
-            mockedReservationService.prototype.getAllReviewsByActivityId = jest.fn().mockResolvedValue(reviews);
-        });
-
-        test('should respond with 200 status code and the list of reviews', async () => {
-            const response = await request(app).get(url);
-            expect(response.status).toBe(200);
-            expect(response.body).toEqual(reviews);
-        });
-    });
-
-    describe('when the reviewService throws a default error', () => {
-        beforeAll(() => {
-            mockedReservationService.prototype.getAllReviewsByActivityId = jest.fn().mockRejectedValue(new Error());
-        });
-
-        test('should respond with 500 status code and the error message', async () => {
-            const response = await request(app).get(url);
-            expect(response.status).toBe(500);
-            expect(response.body).toEqual({ message: 'Ha habido un error en el servidor.' });
-        });
-    });
-
-    describe('when the reviewService throws a custom error', () => {
-        const error = { status: 400, message: 'Custom error' }
-        beforeAll(() => {
-            mockedReservationService.prototype.getAllReviewsByActivityId = jest.fn().mockRejectedValue(error);
-        });
-
-        test('should respond with the status code of the custom error', async () => {
-            const response = await request(app).get(url);
-            expect(response.status).toBe(400);
-            expect(response.body).toEqual({ message: 'Custom error' });
-        });
-    });
-});
-
-describe('POST /activity/:id/review', () => {
-    const url = baseUrl + '/activity/1/review';
+describe('POST /activity/:id/', () => {
+    const url = baseUrl + '/activity/1';
     const review = { name: "test" };
 
     beforeAll(() => {
@@ -86,7 +36,7 @@ describe('POST /activity/:id/review', () => {
     });
 
     describe('when the review is missing', () => {
-        test('should responf with 400 status code and the error message', async () => {
+        test('should respond with 400 status code and the error message', async () => {
             const response = await request(app).post(url);
             expect(response.status).toBe(400);
             expect(response.body).toEqual({ message: 'No se ha recibido la review.' });
@@ -119,8 +69,8 @@ describe('POST /activity/:id/review', () => {
     });
 });
 
-describe('DELETE /activity/:id/review/:id', () => {
-    const url = baseUrl + '/activity/1/review/1';
+describe('DELETE /:id', () => {
+    const url = baseUrl + '/1';
 
     beforeAll(() => {
         mockedTokenService.prototype.getUserId = jest.fn().mockResolvedValue('1');

@@ -9,4 +9,5 @@ export interface ReservationDoc extends Document {
     telephone:number;
     state:PaymentStatus;
     paymentId:string;
+    date:Date;
 }

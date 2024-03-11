@@ -24,6 +24,7 @@ const activitySchema: Schema = new Schema({
   accesibility: { type: String, required: true },
   petsPermited: { type: Boolean, required: true },
   state: { type: String, required: true },
+  category: { type: String, required: true },
   images: [],
 });
 

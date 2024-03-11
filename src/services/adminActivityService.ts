@@ -1,10 +1,11 @@
-import mongoose from "mongoose";
+import mongoose, { QueryOptions } from "mongoose";
 import { ActivityDoc } from "@customTypes/activity"
 import { Event } from "@customTypes/event";
 import { Review } from "@customTypes/review";
 import { Role } from "@customTypes/user";
 import ActivivityScheme from "@models/activitySchema";
 import User from "@models/userSchema";
+import ActivitySchema from "@models/activitySchema";
 
 export default class AdminActivityService {
     addActivity = async (newActivity: ActivityDoc) => {
@@ -133,6 +134,39 @@ export default class AdminActivityService {
                     message: 'Actividad no encontrada'
                 }
             return await activity.save();
+        } catch (error) {
+            throw {
+                status: error?.status || 500,
+                message: error?.message || 'Ha habido un error en el servidor.'
+            }
+        }
+    }
+
+    getAllActivities = async (queryOptions: QueryOptions) => {
+        let query = {
+            $and: [
+                queryOptions.searchString ? {
+                    $or: [
+                        { name: { $regex: queryOptions.searchString, $options: 'i' } },
+                        { description: { $regex: queryOptions.searchString, $options: 'i' } },
+                        { location: { $regex: queryOptions.searchString, $options: 'i' } }
+                    ]
+                } : {},
+                queryOptions.duration && Number.isSafeInteger(queryOptions.duration) ? { duration: { $lt: Number(queryOptions.duration) * 60 } } : {},
+                queryOptions.petsPermited ? { petsPermited: queryOptions.petsPermited } : {},
+                queryOptions.state ? { state: queryOptions.state } : {}
+            ],
+        };
+        console.log(query)
+        try {
+            const activities = queryOptions.price && Number.isSafeInteger(queryOptions.price) ?
+                await ActivitySchema.find(query)
+                    .select('events')
+                    .where('events.price')
+                    .lt(queryOptions.price)
+                :
+                await ActivitySchema.find(query);
+            return activities;
         } catch (error) {
             throw {
                 status: error?.status || 500,

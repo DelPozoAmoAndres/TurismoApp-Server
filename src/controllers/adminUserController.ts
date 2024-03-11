@@ -1,5 +1,6 @@
 import { Response, Request } from "express";
 import { logger } from "@utils/logger";
+import { socket } from "@app";
 
 import AdminUserService from "@services/adminUserService";
 import ReservationService from "@services/reservationService";
@@ -35,6 +36,7 @@ export default class AdminUserController {
             }
 
             await this.adminUserService.addUser(newUser);
+            socket.emit('update', req.body);
             res.status(200).json({ message: 'Usuario registrado correctamente.' });
         } catch (error) {
             logger.error('[AddUser] Ha ocurrido un error en el servidor durante el creación de un nuevo usuario', error);
@@ -67,6 +69,7 @@ export default class AdminUserController {
         const userId = req.params.id;
         try {
             await this.adminUserService.deleteUser(userId);
+            socket.emit('update', req.body);
             res.status(200).json({ message: 'Usuario eliminado correctamente.' });
         } catch (error) {
             logger.error('[DeleteUser] Ha ocurrido un error en el servidor durante la eliminación de un usuario', error);
@@ -77,6 +80,7 @@ export default class AdminUserController {
         const userId = req.params.id;
         try {
             await this.adminUserService.editUser(userId, req.body);
+            socket.emit('update', req.body);
             res.status(200).json({ message: 'Usuario editado correctamente.' });
         } catch (error) {
             logger.error('[EditUser] Ha ocurrido un error en el servidor durante la edición de un usuario', error);

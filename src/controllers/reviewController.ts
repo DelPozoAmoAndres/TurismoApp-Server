@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import { logger } from '@utils/logger';
 import { AuthenticatedRequest } from "@customTypes/autenticatedRequest";
 import ReviewService from '@services/reviewService';
+import { socket } from '@app';
 
 export default class ReviewController {
     private reviewService;
@@ -22,13 +23,14 @@ export default class ReviewController {
 
     addReview = async (req: AuthenticatedRequest, res: Response) => {
         const { body, userId, params: { id } } = req
-        if (!body) {
+        if (!body || Object.keys(body).length === 0) {
             logger.error('[AddReview] No se ha recibido la review.')
             res.status(400).json({ message: 'No se ha recibido la review.' });
             return;
         }
         try {
             await this.reviewService.addReview(id, body, userId);
+            socket.emit('update', req.body);
             res.status(200).json({ message: "Review añadida correctamente" });
         } catch (error) {
             logger.error(`[AddReview] ${error.message}`)
@@ -45,6 +47,7 @@ export default class ReviewController {
         }
         try {
             await this.reviewService.editReview(id, body, userId);
+            socket.emit('update', req.body);
             res.status(200).json({ message: "Review editada correctamente" });
         } catch (error) {
             logger.error(`[EditReview] ${error.message}`)
@@ -56,6 +59,7 @@ export default class ReviewController {
         const { userId, params: { id } } = req
         try {
             await this.reviewService.deleteReview(id.toString(), userId);
+            socket.emit('update', req.body);
             res.status(200).json({ message: "Review eliminada correctamente" });
         } catch (error) {
             logger.error(`[DeleteReview] ${error.message}`)

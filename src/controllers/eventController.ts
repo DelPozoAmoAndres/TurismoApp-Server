@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { logger } from "../utils/logger";
 import EventService from "@services/eventService";
+import { socket } from "@app";
 
 export default class EventController {
     private eventService: EventService;
@@ -45,6 +46,7 @@ export default class EventController {
         const { params:{id}, body } = req;
         try {
             await this.eventService.deleteEvents(id,body);
+            socket.emit('update', req.body);
             res.status(200).json({ message: 'Eventos eliminados correctamente.' });
         } catch (error) {
             logger.error('[DeleteEvents] Ha ocurrido un error en el servidor durante la eliminación de los eventos.', error);

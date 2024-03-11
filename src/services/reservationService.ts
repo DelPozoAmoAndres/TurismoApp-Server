@@ -50,9 +50,11 @@ export default class ReservationService {
                     message: 'El usuario no tiene reservas'
                 };
             }
+
             const result = await Promise.all(user.reservations.map(async (reservation) => {
                 return await this.formatData(reservation);
             }));
+            console.log(result)
             result.sort((a, b) => a.event.date.getTime() - b.event.date.getTime());
 
             return await this.groupReservations(result)
@@ -87,6 +89,7 @@ export default class ReservationService {
         try {
             const user = await User.findById(userId);
             reservation.paymentId = intentId;
+            reservation.date=new Date();
             user.reservations ? user.reservations.push(reservation) : user.reservations = [reservation];
             console.log(user)
             if (user.validateSync())
@@ -140,6 +143,7 @@ export default class ReservationService {
         let activity: ActivityDoc = await Activity.findOne({ "events._id": eventId });
         reservationMap.event = activity?.events?.find((event) => event.id == eventId)
         const status = await this.paymentService.verifyStatus(reservationMap.paymentId);
+        console.log("hola",reservationMap.event.date)
         if (reservationMap.event.date < new Date() && status == "success")
             reservationMap.state = "completed"
         else
@@ -147,6 +151,7 @@ export default class ReservationService {
         let activityFinal = activity.toJSON()
         delete activityFinal.events
         reservationMap.activity = activityFinal
+        
         return reservationMap;
     }
 

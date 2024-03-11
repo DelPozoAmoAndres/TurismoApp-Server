@@ -18,7 +18,6 @@ import mongoose from 'mongoose';
 const mockedMongoose = mongoose as jest.Mocked<typeof mongoose>;
 
 import AdminUserService from "@services/adminUserService";
-import { ReservationDoc } from '@customTypes/reservation';
 
 describe('Add user', () => {
     let adminUserService: AdminUserService;
@@ -191,7 +190,7 @@ describe('Delete user', () => {
     describe('When the user is deleted', () => {
         beforeAll(() => {
             mockedMongoose.Types.ObjectId.isValid = jest.fn().mockReturnValue(true);
-            mockUserScheme.findByIdAndDelete.mockResolvedValue({} as User);
+            mockUserScheme.deleteOne.mockResolvedValue({ acknowledged: true, deletedCount: 1 });
         });
         test('should not throw an error', async () => {
             await expect(adminUserService.deleteUser('1')).resolves.not.toThrow();
@@ -201,7 +200,7 @@ describe('Delete user', () => {
     describe('When the user is not found', () => {
         beforeAll(() => {
             mockedMongoose.Types.ObjectId.isValid = jest.fn().mockReturnValue(true);
-            mockUserScheme.findByIdAndDelete.mockResolvedValue(null);
+            mockUserScheme.deleteOne.mockResolvedValue(null);
         });
         test('should throw an error', async () => {
             await expect(adminUserService.deleteUser('1')).rejects.toMatchObject({ status: 404, message: 'Usuario no encontrado' });
@@ -220,7 +219,7 @@ describe('Delete user', () => {
     describe('When there is an error on the search', () => {
         beforeAll(() => {
             mockedMongoose.Types.ObjectId.isValid = jest.fn().mockReturnValue(true);
-            mockUserScheme.findByIdAndDelete.mockRejectedValue(new Error());
+            mockUserScheme.deleteOne.mockRejectedValue(new Error());
         });
         test('should throw an error', async () => {
             await expect(adminUserService.deleteUser('1')).rejects.toMatchObject({ status: 500, message: 'Ha habido un error en el servidor.' });

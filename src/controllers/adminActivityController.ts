@@ -2,6 +2,7 @@ import { Response, Request } from "express"
 import { logger } from "@utils/logger"
 import AdminActivityService from "@services/adminActivityService"
 import EventService from "@services/eventService";
+import { socket } from "@app";
 
 export default class AdminActivityController {
     private adminActivityService: AdminActivityService;
@@ -32,6 +33,7 @@ export default class AdminActivityController {
 
         try {
             await this.adminActivityService.addActivity(newActivity)
+            socket.emit('update', req.body);
             return res.status(200).json({ message: "Se ha creado correctamente la actividad" })
         } catch (error) {
             logger.error("[AddActivity] Ha ocurrido un error en el servidor durante la creación de una actividad", error);
@@ -49,6 +51,7 @@ export default class AdminActivityController {
 
         try {
             await this.adminActivityService.editActivity(id, body);
+            socket.emit('update', req.body);
             return res.status(200).json({ message: 'Se han realizado correctamente los cambios' })
         } catch (error) {
             logger.error("[EditActivity] Ha ocurrido un error en el servidor durante la edición de una actividad", error);
@@ -59,6 +62,7 @@ export default class AdminActivityController {
     deleteActivity = async (req: Request, res: Response) => {
         try {
             await this.adminActivityService.deleteActivity(req.params.id);
+            socket.emit('update', req.body);
             res.status(200).json({ message: 'Se ha eliminado correctamente la acticividad: ' + req.params.id })
         } catch (error) {
             logger.error("[DeleteActivity] Ha ocurrido un error en el servidor durante la eliminación de una actividad", error);
@@ -125,6 +129,7 @@ export default class AdminActivityController {
 
         try {
             await this.adminActivityService.addEvents(id, events);
+            socket.emit('update', req.body);
             return res.status(200).json({ message: 'Eventos añadidos con exito' });
         } catch (error) {
             logger.error("[AddEvent] Ha ocurrido un error en el servidor durante la creación de un evento", error);
@@ -148,9 +153,21 @@ export default class AdminActivityController {
 
         try {
             await this.adminActivityService.deleteReview(activityId, reviewId)
+            socket.emit('update', req.body);
             res.status(200).json({ message: 'Comentario eliminado con exito' });
         } catch (error) {
             logger.error("[DeleteReview] Ha ocurrido un error en el servidor durante la eliminación de un comentario", error);
+            res.status(error?.status || 500).json({ message: error?.message || 'Ha habido un error en el servidor.' });
+        }
+    }
+
+    getAllActivities = async (req: Request, res: Response) => {
+        const { query } = req;
+        try {
+            const activities = await this.adminActivityService.getAllActivities(query);
+            res.status(200).json(activities);
+        } catch (error) {
+            logger.error('[GetAllActivities] Ha ocurrido un error en el servidor durante la búsqueda de las actividades', error);
             res.status(error?.status || 500).json({ message: error?.message || 'Ha habido un error en el servidor.' });
         }
     }
