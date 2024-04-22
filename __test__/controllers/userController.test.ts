@@ -29,6 +29,7 @@ describe('GET /', () => {
         test('shoud respond with a 200 status code', async () => {
             const res: Response = await request(app)
                 .get(url)
+                .set('Origin', 'http://localhost:3000')
             expect(res.status).toBe(200);
             expect(res.body).toStrictEqual(user);
         });
@@ -42,6 +43,7 @@ describe('GET /', () => {
         test('shoud respond with a 500 status code', async () => {
             const res: Response = await request(app)
                 .get('/api/user')
+                .set('Origin', 'http://localhost:3000')
             expect(res.status).toBe(500);
             expect(res.body).toStrictEqual({ message: 'Ha habido un error en el servidor.' });
         });
@@ -56,6 +58,7 @@ describe('GET /', () => {
         test("shoud respond with the status code of the custom error", async () => {
             const res: Response = await request(app)
                 .get('/api/user')
+                .set('Origin', 'http://localhost:3000')
             expect(res.status).toBe(400);
             expect(res.body).toStrictEqual({ message: 'Test error' });
         });
@@ -82,6 +85,7 @@ describe('PUT /edit', () => {
         test("test_valid", async () => {
             const res: Response = await request(app)
                 .put(url)
+                .set('Origin', 'http://localhost:3000')
             expect(res.status).toBe(200);
             expect(res.body).toStrictEqual({ message: 'Usuario actualizado' });
         });
@@ -95,6 +99,7 @@ describe('PUT /edit', () => {
         test("shoud respond with a 500 status code", async () => {
             const res: Response = await request(app)
                 .put(url)
+                .set('Origin', 'http://localhost:3000')
             expect(res.status).toBe(500);
             expect(res.body).toStrictEqual({ message: 'Ha habido un error en el servidor.' });
         });
@@ -109,6 +114,7 @@ describe('PUT /edit', () => {
         test("shoud respond with the status code of the custom error", async () => {
             const res: Response = await request(app)
                 .put(url)
+                .set('Origin', 'http://localhost:3000')
             expect(res.status).toBe(400);
             expect(res.body).toStrictEqual({ message: 'Test error' });
         });
@@ -136,6 +142,7 @@ describe('PUT /edit/password', () => {
             const res: Response = await request(app)
                 .put(url)
                 .send({ oldPass: 'test', newPass: 'test' })
+                .set('Origin', 'http://localhost:3000')
             expect(res.status).toBe(200);
             expect(res.body).toStrictEqual({ message: 'Contraseña actualizada' });
         })
@@ -151,6 +158,7 @@ describe('PUT /edit/password', () => {
         test("shoud respond with a 400 status code", async () => {
             const res: Response = await request(app)
                 .put(url)
+                .set('Origin', 'http://localhost:3000')
             expect(res.status).toBe(error.status);
             expect(res.body).toStrictEqual({ message: error.message });
         });
@@ -165,6 +173,7 @@ describe('PUT /edit/password', () => {
             const res: Response = await request(app)
                 .put(url)
                 .send({ oldPass: 'test', newPass: 'test' })
+                .set('Origin', 'http://localhost:3000')
             expect(res.status).toBe(500);
             expect(res.body).toStrictEqual({ message: 'Ha habido un error en el servidor.' });
         });
@@ -179,6 +188,7 @@ describe('PUT /edit/password', () => {
             const res: Response = await request(app)
                 .put(url)
                 .send({ oldPass: 'test', newPass: 'test' })
+                .set('Origin', 'http://localhost:3000')
             expect(res.status).toBe(400);
             expect(res.body).toStrictEqual({ message: 'Test error' });
         });

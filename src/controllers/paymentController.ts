@@ -27,11 +27,11 @@ export default class PaymentController {
         const paymentIntentId = req.body.paymentIntentId;
         try {
             const paymentIntent = await this.paymentService.confirmIntent(paymentIntentId);
-            console.log('Pago confirmado:', paymentIntent);
+            logger.info(`[ConfirmIntent] Pago confirmado correctamente: ${paymentIntentId}`);
             res.status(200).json({ message: 'Pago confirmado correctamente' });
         } catch (error) {
-            console.error('Error al confirmar el pago:', error);
-            res.status(500).json({ message: 'Error al confirmar el pago' });
+            logger.error('[ConfirmIntent] Error al confirmar el pago:', error);
+            res.status(error.status || 500).json({ message: error.message || 'Error al confirmar el pago' });
         }
     }
 
@@ -39,10 +39,11 @@ export default class PaymentController {
         const paymentId = req.body.paymentId;
         try {
             const status = await this.paymentService.verifyStatus(paymentId);
+            logger.info(`[VerifyStatus] Estado del pago ${paymentId} - ${status}`);
             res.status(200).json(status);
         } catch (error) {
-            console.error('Error al confirmar el pago:', error);
-            res.status(500).json({ message: 'Error al confirmar el pago' });
+            logger.error('[VerifyStatus] Error al verificar el estado del pago:', error);
+            res.status(error.status || 500).json({ message: error.message || 'Error al verificar el estado del pago' });
         }
     }
 

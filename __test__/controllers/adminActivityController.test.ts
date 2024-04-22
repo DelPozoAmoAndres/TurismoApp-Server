@@ -1,7 +1,11 @@
 import request, { Response } from 'supertest';
 import app from "@app";
+import EventService from "@services/eventService";
 import AdminActivityService from "@services/adminActivityService";
 import TokenService from "@services/tokenService";
+
+jest.mock("@services/eventService");
+const mockedEventService = EventService as jest.Mocked<typeof EventService>;
 
 jest.mock("@services/adminActivityService");
 const mockedAdminActivityService = AdminActivityService as jest.Mocked<typeof AdminActivityService>;
@@ -30,7 +34,7 @@ describe('POST /', () => {
             const res: Response = await request(app)
                 .post(url)
                 .send(body)
-
+                .set('Origin', 'http://localhost:3000')
             expect(res.status).toBe(200);
             expect(res.body).toStrictEqual({ message: "Se ha creado correctamente la actividad" });
         });
@@ -40,6 +44,7 @@ describe('POST /', () => {
         test('shoud respond with a 400 status code', async () => {
             const res: Response = await request(app)
                 .post(url)
+                .set('Origin', 'http://localhost:3000')
             expect(res.status).toBe(400);
             expect(res.body).toStrictEqual({ message: "Faltan algunos datos obligatorios de la nueva actividad" });
         });
@@ -55,6 +60,7 @@ describe('POST /', () => {
             const res: Response = await request(app)
                 .post(url)
                 .send(body)
+                .set('Origin', 'http://localhost:3000')
             expect(res.status).toBe(500);
             expect(res.body).toStrictEqual({ message: "Ha habido un error en el servidor." });
         });
@@ -72,6 +78,7 @@ describe('POST /', () => {
             const res: Response = await request(app)
                 .post(url)
                 .send(body)
+                .set('Origin', 'http://localhost:3000')
             expect(res.status).toBe(error.status);
             expect(res.body).toStrictEqual({ message: error.message });
         });
@@ -99,6 +106,7 @@ describe('PUT /:id', () => {
             const res: Response = await request(app)
                 .put(url)
                 .send(body)
+                .set('Origin', 'http://localhost:3000')
             expect(res.status).toBe(200);
             expect(res.body).toStrictEqual({ message: "Se han realizado correctamente los cambios" });
         });
@@ -107,7 +115,7 @@ describe('PUT /:id', () => {
         test('shoud respond with a 400 status code', async () => {
             const res: Response = await request(app)
                 .put(url)
-
+                .set('Origin', 'http://localhost:3000')
             expect(res.status).toBe(400);
             expect(res.body).toStrictEqual({ message: "Faltan los cambios a aplicar" });
         });
@@ -123,6 +131,7 @@ describe('PUT /:id', () => {
             const res: Response = await request(app)
                 .put('/api/admin/activity/1')
                 .send(body)
+                .set('Origin', 'http://localhost:3000')
             expect(res.status).toBe(500);
             expect(res.body).toStrictEqual({ message: "Ha habido un error en el servidor." });
         });
@@ -140,6 +149,7 @@ describe('PUT /:id', () => {
             const res: Response = await request(app)
                 .put('/api/admin/activity/1')
                 .send(body)
+                .set('Origin', 'http://localhost:3000')
             expect(res.status).toBe(error.status);
             expect(res.body).toStrictEqual({ message: error.message });
         });
@@ -164,6 +174,7 @@ describe('DELETE /:id', () => {
         test('shoud respond with a 200 status code', async () => {
             const res: Response = await request(app)
                 .delete(url)
+                .set('Origin', 'http://localhost:3000')
             expect(res.status).toBe(200);
             expect(res.body).toStrictEqual({ message: "Se ha eliminado correctamente la acticividad: 1" });
         });
@@ -177,6 +188,7 @@ describe('DELETE /:id', () => {
         test('shoud respond with a 500 status code', async () => {
             const res: Response = await request(app)
                 .delete(url)
+                .set('Origin', 'http://localhost:3000')
             expect(res.status).toBe(500);
             expect(res.body).toStrictEqual({ message: "Ha habido un error en el servidor." });
         });
@@ -192,6 +204,7 @@ describe('DELETE /:id', () => {
         test('shoud respond with a the status code of the custom error', async () => {
             const res: Response = await request(app)
                 .delete(url)
+                .set('Origin', 'http://localhost:3000')
             expect(res.status).toBe(error.status);
             expect(res.body).toStrictEqual({ message: error.message });
         });
@@ -229,6 +242,7 @@ describe('POST /:activityId/events', () => {
             const res: Response = await request(app)
                 .post(url)
                 .send(body)
+                .set('Origin', 'http://localhost:3000')
 
             expect(res.status).toBe(200);
             expect(res.body).toStrictEqual({ message: 'Eventos añadidos con exito' });
@@ -260,6 +274,7 @@ describe('POST /:activityId/events', () => {
             const res: Response = await request(app)
                 .post(url)
                 .send(body)
+                .set('Origin', 'http://localhost:3000')
 
             expect(res.status).toBe(200);
             expect(res.body).toStrictEqual({ message: 'Eventos añadidos con exito' });
@@ -293,6 +308,7 @@ describe('POST /:activityId/events', () => {
             const res: Response = await request(app)
                 .post(url)
                 .send(body)
+                .set('Origin', 'http://localhost:3000')
 
             expect(res.body).toStrictEqual({ message: 'Eventos añadidos con exito' });
             expect(res.status).toBe(200);
@@ -318,6 +334,7 @@ describe('POST /:activityId/events', () => {
             const res: Response = await request(app)
                 .post(url)
                 .send(body)
+                .set('Origin', 'http://localhost:3000')
 
             expect(res.status).toBe(500);
             expect(res.body).toStrictEqual({ message: 'Ha habido un error en el servidor.' });
@@ -346,6 +363,7 @@ describe('POST /:activityId/events', () => {
             const res: Response = await request(app)
                 .post(url)
                 .send(body)
+                .set('Origin', 'http://localhost:3000')
 
             expect(res.status).toBe(error.status);
             expect(res.body).toStrictEqual({ message: error.message });
@@ -357,6 +375,7 @@ describe('POST /:activityId/events', () => {
         test('shoud respond with a 400 status code', async () => {
             const res: Response = await request(app)
                 .post(url)
+                .set('Origin', 'http://localhost:3000')
 
             expect(res.status).toBe(400);
             expect(res.body).toStrictEqual({ message: 'Faltan los datos del evento a añadir' });
@@ -378,6 +397,7 @@ describe('POST /:activityId/events', () => {
             const res: Response = await request(app)
                 .post(url)
                 .send(body)
+                .set('Origin', 'http://localhost:3000')
 
             expect(res.status).toBe(400);
             expect(res.body).toStrictEqual({ message: 'Falta la fecha o rango de fechas del evento' });
@@ -403,6 +423,7 @@ describe('POST /:activityId/events', () => {
             const res: Response = await request(app)
                 .post(url)
                 .send(body)
+                .set('Origin', 'http://localhost:3000')
 
             expect(res.status).toBe(400);
             expect(res.body).toStrictEqual({ message: 'Falta especificar un rango de fechas valido para el evento' });
@@ -428,6 +449,7 @@ describe('DELETE /:activityId/review', () => {
         test('shoud respond with a 200 status code', async () => {
             const res: Response = await request(app)
                 .delete(url)
+                .set('Origin', 'http://localhost:3000')
 
             expect(res.status).toBe(200);
             expect(res.body).toStrictEqual({ message: 'Comentario eliminado con exito' });
@@ -442,6 +464,7 @@ describe('DELETE /:activityId/review', () => {
         it('test_default_error', async () => {
             const res: Response = await request(app)
                 .delete(url)
+                .set('Origin', 'http://localhost:3000')
 
             expect(res.status).toBe(500);
             expect(res.body).toStrictEqual({ message: 'Ha habido un error en el servidor.' });
@@ -462,6 +485,7 @@ describe('DELETE /:activityId/review', () => {
 
             const res: Response = await request(app)
                 .delete(url)
+                .set('Origin', 'http://localhost:3000')
 
             expect(res.status).toBe(error.status);
             expect(res.body).toStrictEqual({ message: error.message });
@@ -469,3 +493,125 @@ describe('DELETE /:activityId/review', () => {
         });
     });
 });
+
+describe('GET /event/list',()=>{
+    const url = '/api/admin/activity/event/list';
+
+    beforeAll(() => {
+        mockedTokenService.prototype.adminCheck = jest.fn();
+    });
+
+    afterEach(() => {
+        jest.restoreAllMocks();
+    })
+
+    describe('when the events are retrieved', () => {
+        beforeAll(() => {
+            mockedEventService.prototype.getEvents = jest.fn().mockResolvedValue([]);
+        })
+
+        test('shoud respond with a 200 status code', async () => {
+            const res: Response = await request(app)
+                .get(url)
+                .set('Origin', 'http://localhost:3000')
+
+            expect(res.status).toBe(200);
+            expect(res.body).toStrictEqual([]);
+        });
+    });
+
+    describe('when the adminActivityService throws a default error', () => {
+        beforeAll(() => {
+            mockedEventService.prototype.getEvents = jest.fn().mockRejectedValue(new Error());
+        })
+
+        test('shoud respond with a 500 status code', async () => {
+            const res: Response = await request(app)
+                .get(url)
+                .set('Origin', 'http://localhost:3000')
+
+            expect(res.status).toBe(500);
+            expect(res.body).toStrictEqual({ message: 'Ha habido un error en el servidor.' });
+        });
+    });
+
+    describe('when the adminActivityService throws a custom error', () => {
+        const error = { status: 400, message: 'Test error' };
+
+        beforeAll(() => {
+            mockedEventService.prototype.getEvents = jest.fn().mockRejectedValue(error);
+        })
+
+        test('shoud respond with a the status code of the custom error', async () => {
+            const res: Response = await request(app)
+                .get(url)
+                .set('Origin', 'http://localhost:3000')
+
+            expect(res.status).toBe(error.status);
+            expect(res.body).toStrictEqual({ message: error.message });
+        });
+    });
+})
+
+describe('GET /list',()=>{
+
+    const url = '/api/admin/activity/list';
+
+    beforeAll(() => {
+        mockedTokenService.prototype.adminCheck = jest.fn();
+    });
+
+    afterEach(() => {
+        jest.restoreAllMocks();
+    })
+
+    describe('when the activities are retrieved', () => {
+        beforeAll(() => {
+            mockedAdminActivityService.prototype.getAllActivities = jest.fn().mockResolvedValue([]);
+        })
+
+        test('shoud respond with a 200 status code', async () => {
+            const res: Response = await request(app)
+                .get(url)
+                .set('Origin', 'http://localhost:3000')
+
+            expect(res.status).toBe(200);
+            expect(res.body).toStrictEqual([]);
+        });
+    });
+
+    describe('when the adminActivityService throws a default error', () => {
+        beforeAll(() => {
+            mockedAdminActivityService.prototype.getAllActivities = jest.fn().mockRejectedValue(new Error());
+        })
+
+        test('shoud respond with a 500 status code', async () => {
+            const res: Response = await request(app)
+                .get(url)
+                .set('Origin', 'http://localhost:3000')
+
+            expect(res.status).toBe(500);
+            expect(res.body).toStrictEqual({ message: 'Ha habido un error en el servidor.' });
+        });
+    });
+
+    describe('when the adminActivityService throws a custom error', () => {
+        const error = { status: 400, message: 'Test error' };
+
+        beforeAll(() => {
+            mockedAdminActivityService.prototype.getAllActivities = jest.fn().mockRejectedValue(error);
+        })
+
+        test('shoud respond with a the status code of the custom error', async () => {
+            const res: Response = await request(app)
+                .get(url)
+                .set('Origin', 'http://localhost:3000')
+
+            expect(res.status).toBe(error.status);
+            expect(res.body).toStrictEqual({ message: error.message });
+        });
+    });
+
+});
+
+

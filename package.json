@@ -69,6 +69,7 @@
     "@models": "dist/src/models",
     "@utils": "dist/src/utils",
     "@routes": "dist/src/routes",
-    "@app": "dist/app"
+    "@app": "dist/app",
+    "@middlewares": "dist/src/middlewares"
   }
 }

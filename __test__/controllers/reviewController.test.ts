@@ -29,7 +29,9 @@ describe('POST /activity/:id/', () => {
         });
 
         test('should respond with 200 status code and the message', async () => {
-            const response = await request(app).post(url).send({ review });
+            const response = await request(app).post(url)
+                .send({ review })
+                .set('Origin', 'http://localhost:3000');
             expect(response.status).toBe(200);
             expect(response.body).toEqual({ message: "Review añadida correctamente" });
         });
@@ -37,7 +39,8 @@ describe('POST /activity/:id/', () => {
 
     describe('when the review is missing', () => {
         test('should respond with 400 status code and the error message', async () => {
-            const response = await request(app).post(url);
+            const response = await request(app).post(url)
+                .set('Origin', 'http://localhost:3000');
             expect(response.status).toBe(400);
             expect(response.body).toEqual({ message: 'No se ha recibido la review.' });
         });
@@ -49,7 +52,9 @@ describe('POST /activity/:id/', () => {
         });
 
         test('should respond with 500 status code and the error message', async () => {
-            const response = await request(app).post(url).send({ review });
+            const response = await request(app).post(url)
+                .send({ review })
+                .set('Origin', 'http://localhost:3000');
             expect(response.status).toBe(500);
             expect(response.body).toEqual({ message: 'Ha habido un error en el servidor.' });
         });
@@ -62,7 +67,9 @@ describe('POST /activity/:id/', () => {
         });
 
         test('should respond with the status code of the custom error', async () => {
-            const response = await request(app).post(url).send({ review });
+            const response = await request(app).post(url)
+                .send({ review })
+                .set('Origin', 'http://localhost:3000');
             expect(response.status).toBe(400);
             expect(response.body).toEqual({ message: 'Custom error' });
         });
@@ -86,7 +93,8 @@ describe('DELETE /:id', () => {
         });
 
         test('should respond with 200 status code and the message', async () => {
-            const response = await request(app).delete(url);
+            const response = await request(app).delete(url)
+                .set('Origin', 'http://localhost:3000');
             expect(response.status).toBe(200);
             expect(response.body).toEqual({ message: "Review eliminada correctamente" });
         });
@@ -98,7 +106,8 @@ describe('DELETE /:id', () => {
         });
 
         test('should respond with 500 status code and the error message', async () => {
-            const response = await request(app).delete(url);
+            const response = await request(app).delete(url)
+                .set('Origin', 'http://localhost:3000');
             expect(response.status).toBe(500);
             expect(response.body).toEqual({ message: 'Ha habido un error en el servidor.' });
         });
@@ -111,7 +120,8 @@ describe('DELETE /:id', () => {
         });
 
         test('should respond with the status code of the custom error', async () => {
-            const response = await request(app).delete(url);
+            const response = await request(app).delete(url)
+                .set('Origin', 'http://localhost:3000');
             expect(response.status).toBe(400);
             expect(response.body).toEqual({ message: 'Custom error' });
         });

@@ -1,4 +1,4 @@
-import { mongo } from "mongoose"
+import mongoose from "mongoose"
 import { Review } from "@customTypes/review";
 import Activity from "@models/activitySchema";
 import User from "@models/userSchema";
@@ -7,7 +7,7 @@ export default class ReviewService {
 
     getReviewFromReservation = async (reservationId: string) => {
         try {
-            if (!mongo.ObjectId.isValid(reservationId))
+            if (!mongoose.Types.ObjectId.isValid(reservationId))
                 throw {
                     status: 400,
                     message: "El id de la reserva no es válido"
@@ -40,7 +40,7 @@ export default class ReviewService {
     }
 
     addReview = async (activityId: string, review: Review, userId: string) => {
-        if (!mongo.ObjectId.isValid(activityId))
+        if (!mongoose.Types.ObjectId.isValid(activityId))
             throw {
                 status: 400,
                 message: "El id de la actividad no es válido"
@@ -71,7 +71,7 @@ export default class ReviewService {
         }
     }
     editReview = async (reviewId: string, review: Review, userId: string) => {
-        if (!mongo.ObjectId.isValid(reviewId))
+        if (!mongoose.Types.ObjectId.isValid(reviewId))
             throw {
                 status: 400,
                 message: "El id del comentario no es válido"
@@ -95,7 +95,7 @@ export default class ReviewService {
     }
 
     deleteReview = async (reviewId: string, userId: string) => {
-        if (!mongo.ObjectId.isValid(reviewId))
+        if (!mongoose.Types.ObjectId.isValid(reviewId))
             throw {
                 status: 400,
                 message: "El id del comentario no es válido"

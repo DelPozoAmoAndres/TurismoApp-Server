@@ -2,7 +2,6 @@ import mongoose, { Schema } from "mongoose";
 import { User } from "../customTypes/user";
 import bcrypt from 'bcrypt';
 import ActivitySchema from "./activitySchema";
-import { ReservationDoc } from "@customTypes/reservation";
 
 const UserScheme = new Schema<User>(
     {

@@ -36,7 +36,7 @@ describe('POST /', () => {
             const res: Response = await request(app)
                 .post(url)
                 .send(body)
-
+                .set('Origin', 'http://localhost:3000')
             expect(res.status).toBe(200);
             expect(res.body.message).toBe("Usuario registrado correctamente.");
         });
@@ -45,7 +45,7 @@ describe('POST /', () => {
         test('shoud respond with a 400 status code', async () => {
             const res: Response = await request(app)
                 .post(url)
-
+                .set('Origin', 'http://localhost:3000')
             expect(res.status).toBe(400);
             expect(res.body.message).toBe("No se han enviado todos los parámetros necesarios");
         });
@@ -57,7 +57,7 @@ describe('POST /', () => {
             const res: Response = await request(app)
                 .post(url)
                 .send(body)
-
+                .set('Origin', 'http://localhost:3000')
             expect(res.status).toBe(400);
             expect(res.body.message).toBe("No se han enviado todos los parámetros necesarios");
         });
@@ -69,7 +69,7 @@ describe('POST /', () => {
             const res: Response = await request(app)
                 .post(url)
                 .send(body)
-
+                .set('Origin', 'http://localhost:3000')
             expect(res.status).toBe(400);
             expect(res.body.message).toBe("No se han enviado todos los parámetros necesarios");
         });
@@ -81,7 +81,7 @@ describe('POST /', () => {
             const res: Response = await request(app)
                 .post(url)
                 .send(body)
-
+                .set('Origin', 'http://localhost:3000')
             expect(res.status).toBe(400);
             expect(res.body.message).toBe("No se han enviado todos los parámetros necesarios");
         });
@@ -93,7 +93,7 @@ describe('POST /', () => {
             const res: Response = await request(app)
                 .post(url)
                 .send(body)
-
+                .set('Origin', 'http://localhost:3000')
             expect(res.status).toBe(400);
             expect(res.body.message).toBe("No se han enviado todos los parámetros necesarios");
         });
@@ -111,7 +111,7 @@ describe('POST /', () => {
             const res: Response = await request(app)
                 .post(url)
                 .send(body)
-
+                .set('Origin', 'http://localhost:3000')
             expect(res.status).toBe(500);
             expect(res.body.message).toBe("hola");
         });
@@ -130,7 +130,7 @@ describe('POST /', () => {
             const res: Response = await request(app)
                 .post(url)
                 .send(body)
-
+                .set('Origin', 'http://localhost:3000')
             expect(res.status).toBe(400);
             expect(res.body.message).toBe("El email ya está registrado");
         });
@@ -159,7 +159,7 @@ describe('GET /list', () => {
         test('shoud respond with a 200 status code', async () => {
             const res: Response = await request(app)
                 .get(url)
-
+                .set('Origin', 'http://localhost:3000')
             expect(res.status).toBe(200);
             expect(res.body).toEqual(users);
         });
@@ -173,7 +173,7 @@ describe('GET /list', () => {
         test('shoud respond with a 500 status code', async () => {
             const res: Response = await request(app)
                 .get(url)
-
+                .set('Origin', 'http://localhost:3000')
             expect(res.status).toBe(500);
             expect(res.body.message).toBe('Ha habido un error en el servidor.');
         });
@@ -189,7 +189,7 @@ describe('GET /list', () => {
         test('shoud respond with the status code of the custom error', async () => {
             const res: Response = await request(app)
                 .get(url)
-
+                .set('Origin', 'http://localhost:3000')
             expect(res.status).toBe(400);
             expect(res.body.message).toBe("No hay usuarios registrados");
         });
@@ -217,7 +217,7 @@ describe('GET /:id', () => {
         test('shoud respond with a 200 status code', async () => {
             const res: Response = await request(app)
                 .get(url)
-
+                .set('Origin', 'http://localhost:3000')
             expect(res.status).toBe(200);
             expect(res.body).toEqual(user);
         });
@@ -231,7 +231,7 @@ describe('GET /:id', () => {
         test('shoud respond with a 500 status code', async () => {
             const res: Response = await request(app)
                 .get(url)
-
+                .set('Origin', 'http://localhost:3000')
             expect(res.status).toBe(500);
             expect(res.body.message).toBe('Ha habido un error en el servidor.');
         });
@@ -247,7 +247,7 @@ describe('GET /:id', () => {
         test('shoud respond with the status code of the custom error', async () => {
             const res: Response = await request(app)
                 .get(url)
-
+                .set('Origin', 'http://localhost:3000')
             expect(res.status).toBe(400);
             expect(res.body.message).toBe("El usuario no existe");
         });
@@ -273,7 +273,7 @@ describe('DELETE /:id', () => {
         test('shoud respond with a 200 status code', async () => {
             const res: Response = await request(app)
                 .delete(url)
-
+                .set('Origin', 'http://localhost:3000')
             expect(res.status).toBe(200);
             expect(res.body.message).toBe("Usuario eliminado correctamente.");
         });
@@ -287,7 +287,7 @@ describe('DELETE /:id', () => {
         test('shoud respond with a 500 status code', async () => {
             const res: Response = await request(app)
                 .delete(url)
-
+                .set('Origin', 'http://localhost:3000')
             expect(res.status).toBe(500);
             expect(res.body.message).toBe('Ha habido un error en el servidor.');
         });
@@ -303,7 +303,7 @@ describe('DELETE /:id', () => {
         test('shoud respond with the status code of the custom error', async () => {
             const res: Response = await request(app)
                 .delete(url)
-
+                .set('Origin', 'http://localhost:3000')
             expect(res.status).toBe(400);
             expect(res.body.message).toBe("El usuario no existe");
         });
@@ -329,7 +329,7 @@ describe('PUT /:id', () => {
         test('shoud respond with a 200 status code', async () => {
             const res: Response = await request(app)
                 .put(url)
-
+                .set('Origin', 'http://localhost:3000')
             expect(res.status).toBe(200);
             expect(res.body.message).toBe("Usuario editado correctamente.");
         });
@@ -343,7 +343,7 @@ describe('PUT /:id', () => {
         test('shoud respond with a 500 status code', async () => {
             const res: Response = await request(app)
                 .put(url)
-
+                .set('Origin', 'http://localhost:3000')
             expect(res.status).toBe(500);
             expect(res.body.message).toBe('Ha habido un error en el servidor.');
         });
@@ -359,7 +359,7 @@ describe('PUT /:id', () => {
         test('shoud respond with the status code of the custom error', async () => {
             const res: Response = await request(app)
                 .put(url)
-
+                .set('Origin', 'http://localhost:3000')
             expect(res.status).toBe(400);
             expect(res.body.message).toBe("El usuario no existe");
         });
@@ -387,7 +387,7 @@ describe('GET /:userId/reservation/list', () => {
         test('shoud respond with a 200 status code', async () => {
             const res: Response = await request(app)
                 .get(url)
-
+                .set('Origin', 'http://localhost:3000')
             expect(res.status).toBe(200);
             expect(res.body).toEqual(reservations);
         });
@@ -401,7 +401,7 @@ describe('GET /:userId/reservation/list', () => {
         test('shoud respond with a 500 status code', async () => {
             const res: Response = await request(app)
                 .get(url)
-
+                .set('Origin', 'http://localhost:3000')
             expect(res.status).toBe(500);
             expect(res.body.message).toBe('Ha habido un error en el servidor.');
         });
@@ -417,9 +417,127 @@ describe('GET /:userId/reservation/list', () => {
         test('shoud respond with the status code of the custom error', async () => {
             const res: Response = await request(app)
                 .get(url)
-
+                .set('Origin', 'http://localhost:3000')
             expect(res.status).toBe(400);
             expect(res.body.message).toBe("El usuario no existe");
+        });
+    });
+
+});
+
+describe('GET /workers', () => {
+    const url = baseUrl + '/workers';
+
+    beforeAll(() => {
+        mockedTokenService.prototype.adminCheck = jest.fn();
+    });
+
+    afterEach(()=>{
+        jest.restoreAllMocks();
+    })
+
+    describe('when the adminUserService returns a list of workers', () => {
+        const workers = [{ name: "test", email: "test", password: "test", role: "test" }];
+
+        beforeAll(() => {
+            mockedAdminUserService.prototype.getWorkers = jest.fn().mockReturnValue(workers);
+        });
+
+        test('shoud respond with a 200 status code', async () => {
+            const res: Response = await request(app)
+                .get(url)
+                .set('Origin', 'http://localhost:3000')
+            expect(res.status).toBe(200);
+            expect(res.body).toEqual(workers);
+        });
+    });
+
+    describe('when the adminUserService throws a default error', () => {
+        beforeEach(() => {
+            mockedAdminUserService.prototype.getWorkers = jest.fn().mockRejectedValueOnce(new Error());
+        });
+
+        test('shoud respond with a 500 status code', async () => {
+            const res: Response = await request(app)
+                .get(url)
+                .set('Origin', 'http://localhost:3000')
+            expect(res.status).toBe(500);
+            expect(res.body.message).toBe('Ha habido un error en el servidor.');
+        });
+    });
+
+    describe('when the adminUserService throws a custom error', () => {
+        const error = { status: 400, message: 'No hay trabajadores registrados' };
+
+        beforeAll(() => {
+            mockedAdminUserService.prototype.getWorkers = jest.fn().mockRejectedValueOnce(error);
+        });
+
+        test('shoud respond with the status code of the custom error', async () => {
+            const res: Response = await request(app)
+                .get(url)
+                .set('Origin', 'http://localhost:3000')
+            expect(res.status).toBe(400);
+            expect(res.body.message).toBe("No hay trabajadores registrados");
+        });
+    });
+    
+});
+
+describe('GET /reservation/list', () => {
+    const url = baseUrl + '/reservation/list';
+
+    beforeAll(() => {
+        mockedTokenService.prototype.adminCheck = jest.fn();
+    });
+
+    afterEach(()=>{
+        jest.restoreAllMocks();
+    })
+
+    describe('when the adminUserService returns a list of reservations', () => {
+        const reservations = [{ name: "test", email: "test", password: "test", role: "test" }];
+
+        beforeAll(() => {
+            mockedReservationService.prototype.getAllReservationsAdmin = jest.fn().mockReturnValue(reservations);
+        });
+
+        test('shoud respond with a 200 status code', async () => {
+            const res: Response = await request(app)
+                .get(url)
+                .set('Origin', 'http://localhost:3000')
+            expect(res.status).toBe(200);
+            expect(res.body).toEqual(reservations);
+        });
+    });
+
+    describe('when the adminUserService throws a default error', () => {
+        beforeEach(() => {
+            mockedReservationService.prototype.getAllReservationsAdmin = jest.fn().mockRejectedValueOnce(new Error());
+        });
+
+        test('shoud respond with a 500 status code', async () => {
+            const res: Response = await request(app)
+                .get(url)
+                .set('Origin', 'http://localhost:3000')
+            expect(res.status).toBe(500);
+            expect(res.body.message).toBe('Ha habido un error en el servidor.');
+        });
+    });
+
+    describe('when the adminUserService throws a custom error', () => {
+        const error = { status: 400, message: 'No hay reservas registradas' };
+
+        beforeAll(() => {
+            mockedReservationService.prototype.getAllReservationsAdmin = jest.fn().mockRejectedValueOnce(error);
+        });
+
+        test('shoud respond with the status code of the custom error', async () => {
+            const res: Response = await request(app)
+                .get(url)
+                .set('Origin', 'http://localhost:3000')
+            expect(res.status).toBe(400);
+            expect(res.body.message).toBe("No hay reservas registradas");
         });
     });
 

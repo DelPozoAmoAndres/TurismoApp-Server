@@ -14,6 +14,7 @@ const config: Config.InitialOptions = {
     "@routes/(.*)": "<rootDir>/src/routes/$1",
     "@utils/(.*)": "<rootDir>/src/utils/$1",
     "@app": "<rootDir>/app.ts",
+    "@middlewares/(.*)": "<rootDir>/src/middlewares/$1",
   }
 };
 export default config;

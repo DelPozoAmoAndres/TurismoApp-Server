@@ -3,7 +3,7 @@ import ActivitySchema from "@models/activitySchema";
 import User from "@models/userSchema"
 import { get } from "mongoose";
 
-export class DashboardService {
+export default class DashboardService {
     getTotalReservations = async () => {
         try {
             const result = await User.aggregate([
@@ -72,7 +72,7 @@ export class DashboardService {
             });
 
             for (let index = 1; index <= 30; index++) {
-                if (occupationRatioByDayOfMonth.at(index) !== null) occupationRatioByDayOfMonth.push({ day: index, occupationRatio: 0 });
+                if (occupationRatioByDayOfMonth.find(data=>data.day===index) === undefined) occupationRatioByDayOfMonth.push({ day: index, occupationRatio: 0 });
             };
 
             occupationRatioByDayOfMonth.sort((a, b) => a.day - b.day);
@@ -124,7 +124,8 @@ export class DashboardService {
             }, {});
 
             for (let index = 1; index <= new Date().getDate(); index++) {
-                if (cancelationsByDayOfMonth.at(index) !== null) cancelationsByDayOfMonth.push({ period: index.toString(), cancellations: 0 });
+                const value = cancelationsByDayOfMonth.find((cancelation => Number(cancelation.period)==index));
+                if (value === undefined) cancelationsByDayOfMonth.push({ period: index.toString(), cancellations: 0 });
             };
 
             cancelationsByDayOfMonth.sort((a, b) => parseInt(a.period) - parseInt(b.period));

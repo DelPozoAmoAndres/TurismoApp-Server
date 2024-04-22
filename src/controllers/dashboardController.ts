@@ -1,6 +1,6 @@
 import { Response, Request } from "express";
 import { logger } from "@utils/logger";
-import { DashboardService } from "@services/dashboardService";
+import DashboardService  from "@services/dashboardService";
 
 export default class DashboardController {
     private dashboardService: DashboardService;

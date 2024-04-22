@@ -80,17 +80,13 @@ export default class AdminActivityController {
             logger.error("[AddEvent] Falta la fecha o el rango de fechas del evento");
             return res.status(400).json({ message: 'Falta la fecha o rango de fechas del evento' });
         }
-        if (repeatInfo && repeatInfo.repeatType == "days" && repeatInfo.repeatDays.length == 0) {
-            logger.error("[AddEvent] Falta especificar los dias que se va a repetir el evento");
-            return res.status(400).json({ message: 'Falta especificar los dias que se va a repetir el evento' });
-        }
         if (repeatInfo && repeatInfo.repeatType == "range") {
             if (!repeatInfo.repeatStartDate || new Date(repeatInfo.repeatStartDate) < new Date() || !repeatInfo.repeatEndDate || new Date(repeatInfo.repeatEndDate) < new Date()) {
                 logger.error("[AddEvent] Falta especificar un rango de fechas valido para el evento");
                 return res.status(400).json({ message: 'Falta especificar un rango de fechas valido para el evento' });
             }
             else if (repeatInfo.repeatDays.length == 0 || repeatInfo.repeatDays.length > 7) {
-                logger.error("[AddEvent] Faltan especificar los dias de la semanFaltan especificar los dias de la semana que se va a repetir el eventoa que se va a repetir el evento");
+                logger.error("[AddEvent] Faltan especificar los dias de la semana que se va a repetir el evento");
                 return res.status(400).json({ message: '' });
             }
         }

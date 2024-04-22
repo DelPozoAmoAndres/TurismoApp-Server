@@ -16,6 +16,7 @@
         "@utils/*": ["./src/utils/*"],
         "@routes/*": ["./src/routes/*"],
         "@app": ["./app"],
+        "@middlewares/*": ["./src/middlewares/*"],
       }
     },
     "include": ["src/**/*", "__test__/**/*", "app.ts", "api/server.ts"],

@@ -38,6 +38,7 @@ describe('GET /:id', () => {
 
         test('should respond with status 200 and the reservation', async () => {
             const response : Response = await request(app).get(url)
+                .set('Origin', 'http://localhost:3000')
             expect(response.status).toBe(200)
             expect(response.body).toEqual(reservation)
         });
@@ -50,6 +51,7 @@ describe('GET /:id', () => {
 
         test('should respond with status 500 and a generic message', async () => {
             const response : Response = await request(app).get(url)
+                .set('Origin', 'http://localhost:3000')
             expect(response.status).toBe(500)
             expect(response.body).toEqual({ message: 'Ha habido un error en el servidor.' })
         });
@@ -63,6 +65,7 @@ describe('GET /:id', () => {
 
         test('should respond with the status code of the custom error', async () => {
             const response : Response = await request(app).get(url)
+                .set('Origin', 'http://localhost:3000')
             expect(response.status).toBe(error.status)
             expect(response.body).toEqual({ message: error.message })
         });
@@ -96,6 +99,7 @@ describe('GET /list', () => {
 
         test('should respond with status 200 and the reservations', async () => {
             const response : Response = await request(app).get(url)
+                .set('Origin', 'http://localhost:3000')
             expect(response.status).toBe(200)
             expect(response.body).toEqual(reservations)
         });
@@ -108,6 +112,7 @@ describe('GET /list', () => {
 
         test('should respond with status 500 and a generic message', async () => {
             const response : Response = await request(app).get(url)
+                .set('Origin', 'http://localhost:3000')
             expect(response.status).toBe(500)
             expect(response.body).toEqual({ message: 'Ha habido un error en el servidor.' })
         });
@@ -121,6 +126,7 @@ describe('GET /list', () => {
 
         test('should respond with the status code of the custom error', async () => {
             const response : Response = await request(app).get(url)
+                .set('Origin', 'http://localhost:3000') 
             expect(response.status).toBe(error.status)
             expect(response.body).toEqual({ message: error.message })
         });
@@ -155,7 +161,9 @@ describe('POST /', () => {
         });
 
         test('should respond with status 200 and a message', async () => {
-            const response : Response = await request(app).post(url).send(body)
+            const response : Response = await request(app).post(url)
+                .send(body)
+                .set('Origin', 'http://localhost:3000')
             expect(response.status).toBe(200)
             expect(response.body).toEqual({ mesagge: "Reserva creada correctamente" })
         });
@@ -166,7 +174,9 @@ describe('POST /', () => {
         const body = { intentId }
 
         test('should respond with status 400 and a message', async () => {
-            const response : Response = await request(app).post(url).send(body)
+            const response : Response = await request(app).post(url)
+                .send(body)
+                .set('Origin', 'http://localhost:3000')
             expect(response.status).toBe(400)
             expect(response.body).toEqual({ message: 'No se ha recibido la reserva.' })
         });
@@ -184,7 +194,9 @@ describe('POST /', () => {
         const body = { reservation }
 
         test('should respond with status 400 and a message', async () => {
-            const response : Response = await request(app).post(url).send(body)
+            const response : Response = await request(app).post(url)
+                .send(body)
+                .set('Origin', 'http://localhost:3000')
             expect(response.status).toBe(400)
             expect(response.body).toEqual({ message: 'No se ha recibido el intentId.' })
         });
@@ -207,7 +219,9 @@ describe('POST /', () => {
         });
 
         test('should respond with status 500 and a generic message', async () => {
-            const response : Response = await request(app).post(url).send(body)
+            const response : Response = await request(app).post(url)
+                .send(body)
+                .set('Origin', 'http://localhost:3000')
             expect(response.status).toBe(500)
             expect(response.body).toEqual({ message: 'Ha habido un error en el servidor.' })
         });
@@ -231,7 +245,9 @@ describe('POST /', () => {
         });
 
         test('should respond with the status code of the custom error', async () => {
-            const response : Response = await request(app).post(url).send(body)
+            const response : Response = await request(app).post(url)
+                .send(body)
+                .set('Origin', 'http://localhost:3000')
             expect(response.status).toBe(error.status)
             expect(response.body).toEqual({ message: error.message })
         });
@@ -256,6 +272,7 @@ describe('PUT /:id', () => {
 
         test('should respond with status 200 and a message', async () => {
             const response : Response = await request(app).put(url)
+                .set('Origin', 'http://localhost:3000')
             expect(response.status).toBe(200)
             expect(response.body).toEqual({ mesagge: "Reserva cancelada correctamente" })
         });
@@ -268,6 +285,7 @@ describe('PUT /:id', () => {
 
         test('should respond with status 500 and a generic message', async () => {
             const response : Response = await request(app).put(url)
+                .set('Origin', 'http://localhost:3000')
             expect(response.status).toBe(500)
             expect(response.body).toEqual({ message: 'Ha habido un error en el servidor.' })
         });
@@ -281,6 +299,7 @@ describe('PUT /:id', () => {
 
         test('should respond with the status code of the custom error', async () => {
             const response : Response = await request(app).put(url)
+                .set('Origin', 'http://localhost:3000')
             expect(response.status).toBe(error.status)
             expect(response.body).toEqual({ message: error.message })
         });

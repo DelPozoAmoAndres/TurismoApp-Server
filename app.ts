@@ -5,7 +5,7 @@ import dotenv from 'dotenv';
 import http from 'http';
 import { Server } from "socket.io";
 
-import { authMiddleware } from './src/middleware/authMiddleware';
+import { authMiddleware } from './src/middlewares/authMiddleware';
 const { loggerMiddleware } = require('@utils/logger');
 
 dotenv.config();
@@ -34,7 +34,7 @@ app.use(bodyParser.urlencoded({ limit: '100mb', extended: true }));
 
 const allowedOrigins = ['https://astour.online'];
 const allowedOriginFunc = (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) => {
-    if (!origin || origin.startsWith('http://localhost:') || allowedOrigins.includes(origin)) {
+    if (origin && (origin.startsWith('http://localhost:') || allowedOrigins.includes(origin))) {
         callback(null, true);
     } else {
         callback(new Error('Not allowed by CORS'), false);
@@ -47,6 +47,10 @@ app.use(cors({ origin: allowedOriginFunc }));
 const swaggerUi = require('swagger-ui-express');
 const swaggerDocument = swagger;
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+
+app.get('/', (req, res) => {
+    res.send('Connected to the server');
+});
 
 // Rutas
 app.use('/api', authRoutes);
@@ -64,7 +68,7 @@ export const server = http.createServer(app);
 export const socket = new Server(server, {
     cors: {
         origin: allowedOriginFunc,
-        methods: ["GET", "POST"],
+        methods: ["GET", "POST", "DELETE", "PUT"],
     },
     allowEIO3:true
 });

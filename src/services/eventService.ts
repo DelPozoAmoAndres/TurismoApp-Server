@@ -145,13 +145,6 @@ export default class EventService {
                                 await user.save();
                             });
                         });
-
-                    // await ActivitySchema.updateOne({ "events._id": eventId },
-                    //     {
-                    //         $pull: {
-                    //             events: { $in: eventsToDelete }
-                    //         }
-                    //     });
                     await ActivitySchema.updateMany(
                         { "events._id": { $in: eventsToDelete.map(event => event.id) } },
                         { $set: { "events.$.state": "cancelled" } }

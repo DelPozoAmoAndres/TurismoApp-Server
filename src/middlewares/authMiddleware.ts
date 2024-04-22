@@ -8,7 +8,7 @@ interface AuthenticatedRequest extends Request {
 
 const tokenService = new TokenService();
 
-export const authMiddleware = (requiredRole: Role) => (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+const authMiddleware = (requiredRole: Role) => (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
     try {
         if (requiredRole === Role.administrador){
             tokenService.adminCheck(req)
@@ -20,6 +20,8 @@ export const authMiddleware = (requiredRole: Role) => (req: AuthenticatedRequest
             next();
         }
     } catch (error) {
-        res.status(error?.status || 500).json({ message: error.message || "" })
+        res.status(error?.status || 500).send({ message: error.message || "" })
     }
 };
+
+export { authMiddleware, AuthenticatedRequest };

@@ -18,7 +18,8 @@ describe('POST /login', () => {
         test('shoud respond with a 200 status code', async () => {
             const res: Response = await request(app)
                 .post(url)
-                .send({ email: 'test@test.com', password: 'password' });
+                .send({ email: 'test@test.com', password: 'password' })
+                .set('Origin', 'http://localhost:3000');
 
             expect(res.status).toBe(200);
             expect(res.body).toStrictEqual(body);
@@ -29,7 +30,8 @@ describe('POST /login', () => {
         test('shoud respond with a 400 status code', async () => {
             const res: Response = await request(app)
                 .post(url)
-                .send({ password: 'password' });
+                .send({ password: 'password' })
+                .set('Origin', 'http://localhost:3000');
 
             expect(res.status).toBe(400);
             expect(res.body).toStrictEqual({ message: 'No se han enviado todos los parámetros necesarios' });
@@ -40,7 +42,8 @@ describe('POST /login', () => {
         test('shoud respond with a 400 status code', async () => {
             const res: Response = await request(app)
                 .post(url)
-                .send({ email: 'test@test.com' });
+                .send({ email: 'test@test.com' })
+                .set('Origin', 'http://localhost:3000');
 
             expect(res.status).toBe(400);
             expect(res.body).toStrictEqual({ message: 'No se han enviado todos los parámetros necesarios' });
@@ -54,7 +57,8 @@ describe('POST /login', () => {
         test('shoud respond with a 500 status code', async () => {
             const res: Response = await request(app)
                 .post(url)
-                .send({ email: 'test@test.com', password: 'password' });
+                .send({ email: 'test@test.com', password: 'password' })
+                .set('Origin', 'http://localhost:3000');
 
             expect(res.status).toBe(500);
             expect(res.body).toStrictEqual({ message: 'Ha habido un error en el servidor.' });
@@ -71,7 +75,8 @@ describe('POST /login', () => {
         test('shoud respond with the status code of the custom error', async () => {
             const res: Response = await request(app)
                 .post(url)
-                .send({ email: 'test@test.com', password: 'password' });
+                .send({ email: 'test@test.com', password: 'password' })
+                .set('Origin', 'http://localhost:3000');
 
             expect(res.status).toBe(400);
             expect(res.body).toStrictEqual({ message: error.message });
@@ -89,7 +94,8 @@ describe('POST /register', () => {
         test('shoud respond with a 200 status code', async () => {
             const res: Response = await request(app)
                 .post(url)
-                .send({ name: 'John Doe', email: 'johndoe@example.com', password: 'password' });
+                .send({ name: 'John Doe', email: 'johndoe@example.com', password: 'password' })
+                .set('Origin', 'http://localhost:3000');
 
             expect(res.status).toBe(200);
             expect(res.body).toStrictEqual({ message: 'Usuario registrado correctamente.' });
@@ -104,7 +110,7 @@ describe('POST /register', () => {
             const res: Response = await request(app)
                 .post(url)
                 .send({ name: 'John Doe', email: 'johndoe@example.com', password: 'password', telephone: 30232323, country: 'españa' })
-
+                .set('Origin', 'http://localhost:3000')
             expect(res.status).toBe(200);
             expect(res.body).toStrictEqual({ message: 'Usuario registrado correctamente.' });
         });
@@ -115,7 +121,7 @@ describe('POST /register', () => {
             const res: Response = await request(app)
                 .post(url)
                 .send({ email: 'johndoe@example.com', password: 'password' })
-
+                .set('Origin', 'http://localhost:3000')
             expect(res.status).toBe(400);
             expect(res.body).toStrictEqual({ message: 'No se han enviado todos los parámetros necesarios' });
         });
@@ -126,7 +132,7 @@ describe('POST /register', () => {
             const res: Response = await request(app)
                 .post(url)
                 .send({ name: 'John Doe', password: 'password' })
-
+                .set('Origin', 'http://localhost:3000')
             expect(res.status).toBe(400);
             expect(res.body).toStrictEqual({ message: 'No se han enviado todos los parámetros necesarios' });
         });
@@ -137,7 +143,7 @@ describe('POST /register', () => {
             const res: Response = await request(app)
                 .post(url)
                 .send({ name: 'John Doe', email: 'johndoe@example.com' })
-
+                .set('Origin', 'http://localhost:3000')
             expect(res.status).toBe(400);
             expect(res.body).toStrictEqual({ message: 'No se han enviado todos los parámetros necesarios' });
         });
@@ -152,7 +158,7 @@ describe('POST /register', () => {
             const res: Response = await request(app)
                 .post(url)
                 .send({ name: 'John Doe', email: 'johndoe@example.com', password: 'password', country: '' })
-
+                .set('Origin', 'http://localhost:3000')
             expect(res.status).toBe(200);
             expect(res.body).toStrictEqual({ message: 'Usuario registrado correctamente.' });
         });
@@ -166,7 +172,7 @@ describe('POST /register', () => {
             const res: Response = await request(app)
                 .post(url)
                 .send({ name: 'John Doe', email: 'asdas@gmail.com', password: 'password' })
-
+                .set('Origin', 'http://localhost:3000')
             expect(res.status).toBe(500);
             expect(res.body).toStrictEqual({ message: 'Ha habido un error en el servidor.' });
         });
@@ -182,8 +188,8 @@ describe('POST /register', () => {
         test('shoud respond with the status code of the custom error', async () => {
             const res: Response = await request(app)
                 .post(url)
-                .send({ name: 'John Doe', email: 'johndoe@example.com', password: 'password' });
-
+                .send({ name: 'John Doe', email: 'johndoe@example.com', password: 'password' })
+                .set('Origin', 'http://localhost:3000')
             expect(res.status).toBe(error.status);
             expect(res.body).toStrictEqual({ message: error.message });
         });

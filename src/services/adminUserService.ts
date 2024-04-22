@@ -195,22 +195,22 @@ export default class AdminUserService {
                             break;
                         }
                     } else if (repeatType === 'range' && time) {
-                        for (let day = new Date(repeatStartDate); day <= new Date(repeatEndDate); day.setDate(day.getDate() + 1)) {
-                            const dayOfWeek = day.getDay();
-                            day.setHours(time.split(':')[0], time.split(':')[1]);
-                            
+                        let day = new Date(repeatStartDate);
+                        while (day <= new Date(repeatEndDate)) {
+                            const currentDay = new Date(day);
+                            currentDay.setHours(time.split(':')[0], time.split(':')[1]);
+                            const dayOfWeek = currentDay.getDay();
                             if (repeatDays.includes(dayOfWeek)) {
-                                const proposedStartTime = day;
+                                const proposedStartTime = currentDay;
                                 proposedStartTime.setHours(proposedStartTime.getHours() - MARGIN_BETWEEN_EVENTS);
                                 const proposedEndTime = new Date(proposedStartTime.getTime() + activity.duration * 60000);
                                 proposedEndTime.setHours(proposedEndTime.getHours() + MARGIN_BETWEEN_EVENTS);
-                                
-
                                 if(!(eventEndTime<proposedStartTime || proposedEndTime<eventStartTime)){
                                     workerIsAvailable=false;
                                     break;
                                 }
                             }
+                            day.setDate(day.getDate() + 1);
                         }
                     } else if (repeatType === 'days' && time) {
                         for (const day of repeatDays) {
