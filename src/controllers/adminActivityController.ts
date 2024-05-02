@@ -14,8 +14,8 @@ export default class AdminActivityController {
     }
 
     addActivity = async (req: Request, res: Response) => {
-        const { name, location, duration, description, accesibility, petsPermited, state, images } = req.body;
-        if (!name || !location || !duration || !description || !accesibility || !petsPermited || !state || !images) {
+        const { name, location, duration, description, state, images, category } = req.body;
+        if (!name || !location || !duration || !description || !state || !images) {
             logger.error("[AddActivity] Faltan algunos datos obligatorios de la nueva actividad");
             return res.status(400).json({ message: 'Faltan algunos datos obligatorios de la nueva actividad' })
         }
@@ -25,9 +25,8 @@ export default class AdminActivityController {
             location,
             duration,
             description,
-            accesibility,
-            petsPermited,
             state,
+            category,
             images
         }
 

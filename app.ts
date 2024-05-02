@@ -34,7 +34,7 @@ app.use(bodyParser.urlencoded({ limit: '100mb', extended: true }));
 
 const allowedOrigins = ['https://astour.online'];
 const allowedOriginFunc = (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) => {
-    if (origin && (origin.startsWith('http://localhost:') || allowedOrigins.includes(origin))) {
+    if (origin && (origin.startsWith('http://localhost:') ||  origin.startsWith('http://192.168.') || allowedOrigins.includes(origin))) {
         callback(null, true);
     } else {
         callback(new Error('Not allowed by CORS'), false);

@@ -11,7 +11,6 @@ export default class AdminActivityService {
     addActivity = async (newActivity: ActivityDoc) => {
         try {
             const createdActivity = new ActivivityScheme(newActivity);
-
             const validationError = createdActivity.validateSync();
             if (validationError) {
                 const missingProperties = Object.keys(validationError.errors).join(', ');

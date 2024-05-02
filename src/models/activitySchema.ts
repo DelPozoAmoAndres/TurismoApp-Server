@@ -3,7 +3,7 @@ import { ActivityDoc } from '@customTypes/activity';
 
 const activitySchema: Schema = new Schema({
   name: { type: String, required: true },
-  description: { type: String, required: true },
+  description: { type: Map, required: true },
   location: { type: String, required: true },
   duration: { type: Number, required: true },
   events: [{
@@ -21,10 +21,8 @@ const activitySchema: Schema = new Schema({
     author: { type: String, required: true },
     reservationId: { type: String, required: true },
   }],
-  accesibility: { type: String, required: true },
-  petsPermited: { type: Boolean, required: true },
   state: { type: String, required: true },
-  category: { type: String, required: true },
+  category: { type: String, required: true }, 
   images: [],
 });
 

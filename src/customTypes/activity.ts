@@ -7,15 +7,13 @@ export interface ActivityDoc extends Document {
   name: string;
   location: string;
   duration: number;
-  description: string;
+  description: Map<string, string>;
   events?: Event[];
   reviews?: Review[];
-  accesibility: string;
-  petsPermited: boolean;
   category:ActivityCategory;
   state: ActivityState;
   images:any[]
 }
 
 export enum ActivityState { "abierta", "parada temporalmente", "cancelada" }
-export enum ActivityCategory { "cultural", "deportiva", "gastronómica", "naturaleza", "nocturna", "religiosa", "social"}
+export enum ActivityCategory { "cultural"="cultural", "deportiva"="deportiva", "gastronómica"="gastronómica", "naturaleza"="naturaleza", "nocturna"="nocturna", "religiosa"="religiosa", "social"="social"}

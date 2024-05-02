@@ -20,7 +20,7 @@ export default class AuthController {
         try {
             const { token, user } = await this.authService.login(email, password);
             logger.info('[Login] Inicio de sesión exitoso del usuario:', user._id);
-            res.status(200).json({ token, user });
+            return res.status(200).json({ token, user });
         } catch (error) {
             logger.error('[Login] Ha ocurrido un error en el servidor durante el inicio de sesión.', error);
             res.status(error?.status || 500).json({ message: error?.message || 'Ha habido un error en el servidor.' });
@@ -32,7 +32,7 @@ export default class AuthController {
         if (!email || !password || !name) {
             logger.error('[Register] No se han enviado todos los parámetros necesarios');
             return res.status(400).json({ message: 'No se han enviado todos los parámetros necesarios' });
-        }
+        } 
         try {
             let newUser: any = {
                 name,
