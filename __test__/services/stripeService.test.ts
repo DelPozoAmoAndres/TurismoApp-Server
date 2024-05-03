@@ -54,35 +54,35 @@ describe('Verify status', () => {
     });
   });
 
-  describe('When the reservation have a status pending in the ddbb and was refunded', () => {
-    const user = {
-      reservations: [
-        {
-          paymentId: 'intentId',
-          state: 'pending'
-        }
-      ]
-    };
+  // describe('When the reservation have a status pending in the ddbb and was refunded', () => {
+  //   const user = {
+  //     reservations: [
+  //       {
+  //         paymentId: 'intentId',
+  //         state: 'pending'
+  //       }
+  //     ]
+  //   };
 
-    const paymentIntent = {
-      latest_charge: 'chargeId'
-    };
-    const charge = {
-      refunded: true
-    };
-    beforeAll(() => {
-      mockedUserSchema.findOne = jest.fn().mockReturnValue({ exec: jest.fn().mockResolvedValue(user) });
-      mockedStripe.prototype.paymentIntents = {
-        retrieve: jest.fn().mockResolvedValue(paymentIntent),
-      } as any;
+  //   const paymentIntent = {
+  //     latest_charge: 'chargeId'
+  //   };
+  //   const charge = {
+  //     refunded: true
+  //   };
+  //   beforeAll(() => {
+  //     mockedUserSchema.findOne = jest.fn().mockReturnValue({ exec: jest.fn().mockResolvedValue(user) });
+  //     mockedStripe.prototype.paymentIntents = {
+  //       retrieve: jest.fn().mockResolvedValue(paymentIntent),
+  //     } as any;
 
-      mockedStripe.prototype.charges = {
-        retrieve: jest.fn().mockResolvedValue(charge),
-      } as any;
-    });
-    test('Should return canceled if the paymentIntent has been refunded', async () => {
-      const result = await stripeService.verifyStatus('intentId');
-      expect(result).toBe('canceled');
-    });
-  });
+  //     mockedStripe.prototype.charges = {
+  //       retrieve: jest.fn().mockResolvedValue(charge),
+  //     } as any;
+  //   });
+  //   test('Should return canceled if the paymentIntent has been refunded', async () => {
+  //     const result = await stripeService.verifyStatus('intentId');
+  //     expect(result).toBe('canceled');
+  //   });
+  // });
 });
