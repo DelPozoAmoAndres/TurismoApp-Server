@@ -32,16 +32,16 @@ app.use(loggerMiddleware);
 app.use(bodyParser.json({ limit: '100mb' }));
 app.use(bodyParser.urlencoded({ limit: '100mb', extended: true }));
 
-// const allowedOrigins = ['https://astour.online'];
-// const allowedOriginFunc = (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) => {
-//     if (origin && (origin.startsWith('http://localhost:') ||  origin.startsWith('http://192.168.') || allowedOrigins.includes(origin))) {
-//         callback(null, true);
-//     } else {
-//         callback(new Error('Not allowed by CORS'), false);
-//     }
-// };
+const allowedOrigins = ['https://astour.online'];
+const allowedOriginFunc = (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) => {
+    if (origin && (origin.startsWith('http://localhost:') || origin.startsWith('http://192.168.') || allowedOrigins.includes(origin))) {
+        callback(null, true);
+    } else {
+        callback(new Error('Not allowed by CORS'), false);
+    }
+};
 
-// app.use(cors({ origin: allowedOriginFunc }));
+app.use(cors());
 
 //Swagger
 const swaggerUi = require('swagger-ui-express');
@@ -66,10 +66,10 @@ app.use('/api/dashboard', authMiddleware(Role.administrador), dashboard);
 
 export const server = http.createServer(app);
 export const socket = new Server(server, {
-    // cors: {
-    //     origin: allowedOriginFunc,
-    //     methods: ["GET", "POST", "DELETE", "PUT"],
-    // },
+    cors: {
+        origin: allowedOriginFunc,
+        methods: ["GET", "POST", "DELETE", "PUT"],
+    },
     allowEIO3: true
 });
 
