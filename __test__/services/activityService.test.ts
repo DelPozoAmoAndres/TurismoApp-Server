@@ -146,18 +146,17 @@ describe('Get events by activity id', () => {
     });
 
     describe('When there are events', () => {
-        const activity: ActivityDoc = {
+        const activity = {
             name: 'Hiking',
             location: 'Mountains',
+            category: 'Adventure',
             duration: 120,
-            description: 'A fun and challenging activity for nature lovers',
-            accesibility: 'Moderate',
-            petsPermited: true,
+            description: { es: 'Una actividad divertida y desafiante para los amantes de la naturaleza', en: 'A fun and challenging activity for nature lovers' },
             state: ActivityState.abierta,
             images: ['image1.jpg', 'image2.jpg'],
             events: [new Event(10, new Date(), 10, 'English', 'John Doe'), new Event(10, new Date(), 10, 'English', 'John Doe')]
-          } as ActivityDoc;
-        beforeAll(()=>{
+        };
+        beforeAll(() => {
             // jest.spyOn(mongoose.Types.ObjectId, 'isValid').mockReturnValue(true);
             mockedActivity.aggregate.mockReturnValue({
                 exec: jest.fn().mockResolvedValue([activity]),
@@ -171,22 +170,21 @@ describe('Get events by activity id', () => {
     });
 
     describe('When there are no events', () => {
-        const activity: ActivityDoc = {
+        const activity = {
             name: 'Hiking',
             location: 'Mountains',
             duration: 120,
-            description: 'A fun and challenging activity for nature lovers',
-            accesibility: 'Moderate',
-            petsPermited: true,
+            description: { es: 'Una actividad divertida y desafiante para los amantes de la naturaleza', en: 'A fun and challenging activity for nature lovers' },
+            category: 'Adventure',
             state: ActivityState.abierta,
             images: ['image1.jpg', 'image2.jpg'],
-            events: []
-          } as ActivityDoc;
-        beforeAll(()=>{
+            events: [] as any
+        };
+        beforeAll(() => {
             jest.spyOn(mongoose.Types.ObjectId, 'isValid').mockReturnValue(true);
             mockedActivity.aggregate.mockReturnValue({
                 exec: jest.fn().mockResolvedValue([activity]),
-            }as any);
+            } as any);
         });
 
         test('Should return an error', async () => {
@@ -198,11 +196,11 @@ describe('Get events by activity id', () => {
     });
 
     describe('When the activity does not exist', () => {
-        beforeAll(()=>{
+        beforeAll(() => {
             jest.spyOn(mongoose.Types.ObjectId, 'isValid').mockReturnValue(true);
             mockedActivity.aggregate.mockReturnValue({
                 exec: jest.fn().mockResolvedValue(null),
-            }as any);
+            } as any);
         });
 
         test('Should return an error', async () => {
@@ -214,7 +212,7 @@ describe('Get events by activity id', () => {
     });
 
     describe('When the activity id is not valid', () => {
-        beforeAll(()=>{
+        beforeAll(() => {
             jest.spyOn(mongoose.Types.ObjectId, 'isValid').mockReturnValue(false);
         });
         test('Should return an error', async () => {

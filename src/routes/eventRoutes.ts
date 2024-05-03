@@ -7,6 +7,7 @@ const eventController = new EventController();
 router
     .get("/:id", eventController.getOneEvent)
     .get("/:id/participants", eventController.getParticipants)
+    .put("/:id", eventController.updateEvent)
     .get("/list/:id", eventController.getWorkerEvents)
     .delete("/:id/recurrence", eventController.deleteEvents)
 

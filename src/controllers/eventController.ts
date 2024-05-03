@@ -43,13 +43,25 @@ export default class EventController {
     }
 
     deleteEvents = async (req: Request, res: Response) => {
-        const { params:{id}, body } = req;
+        const { params: { id }, body } = req;
         try {
-            await this.eventService.deleteEvents(id,body);
+            await this.eventService.deleteEvents(id, body);
             socket.emit('update', req.body);
             res.status(200).json({ message: 'Eventos eliminados correctamente.' });
         } catch (error) {
             logger.error('[DeleteEvents] Ha ocurrido un error en el servidor durante la eliminación de los eventos.', error);
+            res.status(error?.status || 500).json({ message: error?.message || 'Ha habido un error en el servidor.' });
+        }
+    }
+
+    updateEvent = async (req: Request, res: Response) => {
+        const { params: { id }, body } = req;
+        try {
+            await this.eventService.updateEvent(id, body);
+            socket.emit('update', req.body);
+            res.status(200).json({ message: 'Evento actualizado correctamente.' });
+        } catch (error) {
+            logger.error('[UpdateEvent] Ha ocurrido un error en el servidor durante la actualización del evento.', error);
             res.status(error?.status || 500).json({ message: error?.message || 'Ha habido un error en el servidor.' });
         }
     }

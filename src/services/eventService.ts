@@ -91,13 +91,13 @@ export default class EventService {
     }
 
     getEvents = async (search: string, filters: Record<string, unknown>) => {
-        let events;
+        let activities;
         try {
-            events = await ActivitySchema.find({ "events": { $exists: true, $not: { $size: 0 } ,$elemMatch: { state: { $ne: "cancelled" } }} });
-            if (!events)
+            activities = await ActivitySchema.find({ "events": { $exists: true, $not: { $size: 0 }, $elemMatch: { state: { $ne: "cancelled" } } } });
+            if (!activities)
                 throw {
                     status: 404,
-                    message: 'No hay eventos para este trabajador'
+                    message: 'No hay eventos'
                 }
 
         } catch (error) {
@@ -106,7 +106,7 @@ export default class EventService {
                 message: error?.message || 'Ha habido un error en el servidor.'
             }
         }
-        return events.flatMap((event: any) => event.events.filter((e: any) => e.state !== "cancelled"));
+        return activities.flatMap((event: any) => event.events.filter((e: any) => e.state !== "cancelled"));
     }
 
     deleteEvents = async (eventId: string, body: RecurrentEventDeleteRequest) => {
@@ -127,7 +127,7 @@ export default class EventService {
             await ActivitySchema.findOne({ "events._id": eventId })
                 .then(async (activity: ActivityDoc) => {
                     let targetEvent = activity.events.find((event) => event.id == eventId);
-                    let eventsToDelete = body.recurrenceDays.length>0 ?activity.events.filter(
+                    let eventsToDelete = body.recurrenceDays.length > 0 ? activity.events.filter(
                         (event: Event) =>
                             event.guide == targetEvent.guide
                             && new Date(event.date) >= startDate
@@ -135,7 +135,7 @@ export default class EventService {
                             && new Date(event.date).getHours() === new Date(targetEvent.date).getHours()
                             && new Date(event.date).getMinutes() === new Date(targetEvent.date).getMinutes()
                             && body.recurrenceDays.includes(new Date(event.date).getDay())
-                    ): [targetEvent];
+                    ) : [targetEvent];
                     await UserSchema.find({ 'reservations.eventId': { $in: eventsToDelete.map((event: Event) => event.id) }, 'reservations.state': 'success' }).
                         then(async (users) => {
                             users.forEach(async (user) => {
@@ -148,6 +148,39 @@ export default class EventService {
                     await ActivitySchema.updateMany(
                         { "events._id": { $in: eventsToDelete.map(event => event.id) } },
                         { $set: { "events.$.state": "cancelled" } }
+                    );
+                });
+        } catch (error) {
+            throw {
+                status: error?.status || 500,
+                message: error?.message || 'Ha habido un error en el servidor.'
+            }
+        }
+    }
+
+    updateEvent = async (eventId: string, body: Event) => {
+        if (!mongoose.Types.ObjectId.isValid(eventId))
+            throw {
+                status: 400,
+                message: 'El identificador del evento no es válido'
+            }
+
+        try {
+            ActivitySchema.findOne({ "events._id": eventId })
+                .then(async (activity: ActivityDoc) => {
+                    const targetEvent = activity.events.find((event) => event.id == eventId);
+                    if (!targetEvent)
+                        throw {
+                            status: 404,
+                            message: 'Evento no encontrado'
+                        }
+
+                    targetEvent.guide = body.guide || targetEvent.guide;
+                    targetEvent.seats = body.seats || targetEvent.seats;
+                    console.log(targetEvent);
+                    await ActivitySchema.updateOne(
+                        { "events._id": eventId },
+                        { $set: { "events.$": targetEvent } }
                     );
                 });
         } catch (error) {
