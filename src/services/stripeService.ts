@@ -8,7 +8,7 @@ export default class StripeService implements PaymentService {
 
   verifyStatus = async (intentId: string): Promise<PaymentStatus> => {
     const user = await UserSchema.findOne({ "reservations.paymentId": intentId }, { "reservations.$": 1 }).exec();
-    if (user && user.reservations && user.reservations.length > 0 && user.reservations[0].state!=="pending") {
+    if (user && user.reservations && user.reservations.length > 0 && user.reservations[0].state !== "pending") {
       return user.reservations[0].state;
     }
 
@@ -51,11 +51,11 @@ export default class StripeService implements PaymentService {
       await this.stripe.paymentIntents.cancel(paymentIntentId)
     else
       await this.stripe.refunds.create({ charge: paymentIntent.latest_charge.toString() });
-    const user = await UserSchema.findOneAndUpdate({ "reservations.paymentId": paymentIntentId }, { $set: { "reservations.$.state": "canceled" }}, { new: true }).exec();
+    const user = await UserSchema.findOneAndUpdate({ "reservations.paymentId": paymentIntentId }, { $set: { "reservations.$.state": "canceled" } }, { new: true }).exec();
     console.log("user", user)
-    const reservation = user.reservations.filter(reservation=>reservation.paymentId===paymentIntentId)[0];
+    const reservation = user.reservations.filter(reservation => reservation.paymentId === paymentIntentId)[0];
     console.log("reservation", reservation)
-    await ActivitySchema.findOneAndUpdate({ "events._id": reservation.eventId }, { $inc: { "events.$.bookedSeats": - reservation.numPersons} }).exec();
+    await ActivitySchema.findOneAndUpdate({ "events._id": reservation.eventId }, { $inc: { "events.$.bookedSeats": - reservation.numPersons } }).exec();
   }
 
   confirmIntent = async (paymentIntentId: string): Promise<PaymentIntent> => {

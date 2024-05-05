@@ -30,6 +30,7 @@
     "@types/helmet": "^4.0.0",
     "@types/jest": "^29.5.1",
     "@types/jsonwebtoken": "^9.0.2",
+    "@types/nodemailer": "^6.4.15",
     "@types/socket.io": "^3.0.2",
     "@types/supertest": "^2.0.12",
     "bcrypt": "^5.1.0",
@@ -57,8 +58,10 @@
   },
   "dependencies": {
     "express-ip": "^1.0.4",
+    "google-auth-library": "^9.9.0",
     "module-alias": "^2.2.3",
     "multer": "*",
+    "nodemailer": "^6.9.13",
     "socket.io": "4.7.4",
     "stripe": "^12.7.0"
   },

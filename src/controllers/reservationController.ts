@@ -3,16 +3,18 @@ import { AuthenticatedRequest } from "@customTypes/autenticatedRequest";
 import { logger } from "@utils/logger";
 import ReservationService from "@services/reservationService";
 import { socket } from "@app";
+import EmailService from "@services/emailService";
 
 export default class ReservationController {
     private reservationService: ReservationService;
+    private emailService: EmailService = new EmailService();
 
     constructor(reservationService?: ReservationService) {
         this.reservationService = reservationService || new ReservationService();
     }
 
     getOneReservation = async (req: AuthenticatedRequest, res: Response) => {
-        const { params: {id}, userId } = req;
+        const { params: { id }, userId } = req;
         try {
             const reservation = await this.reservationService.getOneReservation(id, userId);
             res.status(200).json(reservation);
@@ -42,6 +44,7 @@ export default class ReservationController {
         }
         try {
             await this.reservationService.createReservation(reservation, intentId, userId);
+            this.emailService.sendConfirmReservationEmail(reservation);
             socket.emit('reservation', req.body);
             res.status(200).json({ mesagge: "Reserva creada correctamente" });
         } catch (error) {
@@ -50,7 +53,7 @@ export default class ReservationController {
         }
     }
     cancelReservation = async (req: AuthenticatedRequest, res: Response) => {
-        const { params: {id}, userId } = req;
+        const { params: { id }, userId } = req;
         try {
             await this.reservationService.cancelReservation(id, userId);
             socket.emit('update', req.body);

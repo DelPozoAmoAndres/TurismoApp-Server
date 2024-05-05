@@ -90,7 +90,6 @@ export default class ReservationService {
             reservation.paymentId = intentId;
             reservation.date = new Date();
             user.reservations ? user.reservations.push(reservation) : user.reservations = [reservation];
-            console.log(user.validateSync())
             if (user.validateSync())
                 throw {
                     status: 400,

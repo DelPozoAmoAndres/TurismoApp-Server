@@ -21,7 +21,7 @@ const UserScheme = new Schema<User>(
             paymentId: { type: String, required: true },
             price: { type: Number, required: true },
             state: { type: String, required: false },
-            date:{type: Date, required: true},
+            date: { type: Date, required: true },
         }],
 
     },
@@ -53,7 +53,7 @@ UserScheme.pre<User>('findOneAndUpdate', async function () {
 UserScheme.pre<User>(['save'], async function () {
     const updatedUser = this;
     if (updatedUser.isModified('reservations')) {
-        const reservation = updatedUser.reservations.at(-1);
+        const reservation = updatedUser.reservations[updatedUser.reservations.length - 1];
         const activity = await ActivitySchema.findOne({ 'events._id': reservation.eventId }, { 'events.$': 1 });
         const newBookedSeats = activity.events[0].bookedSeats + reservation.numPersons;
         await ActivitySchema.updateOne(
@@ -64,7 +64,7 @@ UserScheme.pre<User>(['save'], async function () {
 });
 
 UserScheme.pre<User>('deleteOne', async function () {
-    const query = this as any; 
+    const query = this as any;
     const user = await UserSchema.findOne(query);
 
     if (user && user.reservations) {

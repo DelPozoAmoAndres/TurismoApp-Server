@@ -20,6 +20,7 @@ import reservations from '@routes/reservationRoutes';
 import reviews from '@routes/reviewRoutes';
 import payments from '@routes/paymentRoutes';
 import dashboard from '@routes/dashboardRoutes';
+import emailRoutes from '@routes/emailRoutes';
 import { Role } from '@customTypes/user';
 
 import swagger from './swagger.json'
@@ -53,6 +54,7 @@ app.get('/', (req, res) => {
 });
 
 // Rutas
+app.use('/email', emailRoutes);
 app.use('/api', authRoutes);
 app.use('/api/user', authMiddleware(Role.turista), userRoutes);
 app.use('/api/activity', activityRoutes);
