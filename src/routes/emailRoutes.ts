@@ -1,11 +1,11 @@
-import EmailController from '@controllers/emailController';
-import express from 'express';
+// import EmailController from '@controllers/emailController';
+// import express from 'express';
 
-const router = express.Router();
-const emailController = new EmailController();
+// const router = express.Router();
+// const emailController = new EmailController();
 
-router
-    .get("/auth", emailController.getAuth)
-    .get("/token", emailController.setToken)
+// router
+//     .get("/auth", emailController.getAuth)
+//     .get("/token", emailController.setToken)
 
-export default router
+// export default router
