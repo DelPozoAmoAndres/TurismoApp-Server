@@ -28,14 +28,14 @@ export default class TokenService {
     signToken = (decodedToken: DecodedToken) => {
         logger.debug(`[SignToken] Firma de un token de sesión - token: ${decodedToken.userId} - admin: ${decodedToken.isAdmin}`)
         return jwt.sign({ userId: decodedToken.userId, isAdmin: decodedToken.isAdmin }, process.env.JWT_SECRET, {
-            expiresIn: '1h'
+            expiresIn: '1w'
         });
     }
 
     createToken = (user: User) => {
         logger.debug(`[CreateToken] Creación de un token de sesión - usuario: ${user._id} - admin: ${user.role === Role.administrador}`)
         return jwt.sign({ userId: user._id, isAdmin: user.role === Role.administrador }, process.env.JWT_SECRET, {
-            expiresIn: '10h'
+            expiresIn: '1w'
         });
     }
 

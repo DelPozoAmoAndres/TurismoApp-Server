@@ -12,14 +12,10 @@ export default class ActivityController {
     getAllActivities = async (req: Request, res: Response) => {
         const { query } = req
 
-        if (query.precio && !Number.isSafeInteger(query.precio)) {
+        if (query.precio && !Number.isSafeInteger(Number(query.precio))) {
             logger.error("[GetAllActivities] Filtro de precio con formato incorrecto:", req.query.precio);
             return res.status(400).json({ message: 'Filtro de precio con formato incorrecto' });
 
-        }
-        if (query.duration && !Number.isSafeInteger(query.duration)) {
-            logger.error("[GetAllActivities] Filtro de duración con formato incorrecto:", req.query.duración);
-            return res.status(400).json({ message: 'Filtro de duración con formato incorrecto' });
         }
 
         try {
@@ -72,5 +68,25 @@ export default class ActivityController {
             res.status(error.status || 500).json({ message: error.message || 'Ha habido un error en el servidor.' });
         }
 
+    }
+
+    getMaxPrice = async (req: Request, res: Response) => {
+        try {
+            const maxPrice = await this.activityService.getMaxPrice();
+            res.status(200).json(maxPrice);
+        } catch (error) {
+            logger.error("[GetMaxPrice] Ha ocurrido un error en el servidor durante la obtencion del precio máximo", error);
+            res.status(error?.status || 500).json({ message: error?.message || 'Ha habido un error en el servidor.' });
+        }
+    }
+
+    getPopular = async (req: Request, res: Response) => {
+        try {
+            const popular = await this.activityService.getPopular();
+            res.status(200).json(popular);
+        } catch (error) {
+            logger.error("[GetPopular] Ha ocurrido un error en el servidor durante la obtencion de las actividades populares", error);
+            res.status(error?.status || 500).json({ message: error?.message || 'Ha habido un error en el servidor.' });
+        }
     }
 }

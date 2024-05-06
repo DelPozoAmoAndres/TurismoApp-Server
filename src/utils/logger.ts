@@ -1,4 +1,4 @@
-import { NextFunction } from "express";
+import { NextFunction, Response } from "express";
 import moment from 'moment-timezone'
 
 const winston = require('winston');
@@ -22,10 +22,10 @@ const loggerDefault = winston.createLogger({
             zippedArchive: true,
             maxSize: '20m',
             maxFiles: '14d',
-            meta:true,
+            meta: true,
             format: winston.format.combine(
-                winston.format.printf(({ level, message, timestamp, ip}: { level: string, message: string, timestamp: string, ip: string })=> {
-                    return `${timestamp} [${level.toUpperCase()}] ${ip ?"("+ip+")" : ''} ${message} `;
+                winston.format.printf(({ level, message, timestamp, ip }: { level: string, message: string, timestamp: string, ip: string }) => {
+                    return `${timestamp} [${level.toUpperCase()}] ${ip ? "(" + ip + ")" : ''} ${message} `;
                 })
             )
         })
@@ -35,7 +35,7 @@ const loggerDefault = winston.createLogger({
 let logger: any = loggerDefault;
 
 const loggerMiddleware = (req: any, res: Response, next: NextFunction) => {
-    logger = loggerDefault.child({ ip: req.ip });
+    logger = loggerDefault.child({ ip: "notData" });
     next();
 };
 

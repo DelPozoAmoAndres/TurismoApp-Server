@@ -6,6 +6,8 @@ const actitivityController = new ActivityController();
 
 router
     .get("/list", actitivityController.getAllActivities)
+    .get('/maxPrice', actitivityController.getMaxPrice)
+    .get('/popular', actitivityController.getPopular)
     .get("/:id", actitivityController.getOneActivity)
     .get("/event/:id", actitivityController.getActivityFromEvent)
     .get("/:id/events", actitivityController.getEvents)

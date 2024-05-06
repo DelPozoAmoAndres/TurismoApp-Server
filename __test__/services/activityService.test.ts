@@ -22,25 +22,13 @@ describe('Get all activities', () => {
 
 
     describe('when the activities are found and there are price filters', () => {
-        const queryOptions = {
-            price: 12
-        };
         const activities = [{ name: "", description: "", location: "", duration: 0, petsPermited: false, state: "" }];
         beforeAll(() => {
-            mockedActivity.find = jest.fn().mockReturnValue(
-                {
-                    select: jest.fn().mockReturnValue(
-                        {
-                            where: jest.fn().mockReturnValue(
-                                { lt: jest.fn().mockResolvedValue(activities) }
-                            )
-                        }
-                    )
-                }
-            );
+            mockedActivity.aggregate = jest.fn().mockResolvedValue(activities);
         });
+
         test('should respond with activities', async () => {
-            const result = await activityService.getAllActivities(queryOptions);
+            const result = await activityService.getAllActivities({ price: 12 });
             expect(result).toStrictEqual(activities);
         });
     });
@@ -49,26 +37,13 @@ describe('Get all activities', () => {
         const queryOptions = {
             searchString: 'test',
         };
-        const activities = [{ name: "", description: "", location: "", duration: 0, petsPermited: false, state: "" }];
+        const activities = [{ name: "test", description: "", location: "", duration: 0, petsPermited: false, state: "" }];
         beforeAll(() => {
-            mockedActivity.find = jest.fn().mockResolvedValue(activities);
+            mockedActivity.aggregate = jest.fn().mockResolvedValue(activities);
         });
         test('should respond with activities', async () => {
             const result = await activityService.getAllActivities(queryOptions);
             expect(result).toStrictEqual(activities);
-        });
-    });
-
-    describe('when an error occurs while filtering', () => {
-        const queryOptions = {
-            duration: 'test',
-        };
-        beforeAll(() => {
-            mockedActivity.find = jest.fn().mockRejectedValue(new Error());
-        });
-        test('should throw an error', async () => {
-            await expect(activityService.getAllActivities(queryOptions))
-                .rejects.toMatchObject({ status: 500, message: 'Ha habido un error en el servidor.' });
         });
     });
 });

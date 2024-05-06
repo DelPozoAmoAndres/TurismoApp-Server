@@ -1,35 +1,106 @@
-import mongoose, { QueryOptions } from "mongoose";
+import mongoose from "mongoose";
 import Activity from "@models/activitySchema";
 import { ActivityDoc } from "@customTypes/activity";
 import User from "@models/userSchema";
 
+interface QueryOptions {
+    originDate?: string;
+    endDate?: string;
+    searchString?: string;
+    price?: number;
+    numPersons?: number;
+    minScore?: number;
+    language?: string;
+}
+
+interface MatchCondition {
+    [key: string]: any;
+}
+
+interface Query {
+    $or?: { [key: string]: any }[];
+}
+
 export default class ActivityService {
+
     getAllActivities = async (queryOptions: QueryOptions) => {
-        let query = {
-            $and: [
-                queryOptions.searchString ? {
-                    $or: [
-                        { name: { $regex: queryOptions.searchString, $options: 'i' } },
-                        { description: { $regex: queryOptions.searchString, $options: 'i' } },
-                        { location: { $regex: queryOptions.searchString, $options: 'i' } }
-                    ]
-                } : {},
-                queryOptions.duration && Number.isSafeInteger(queryOptions.duration) ? { duration: { $lt: Number(queryOptions.duration) * 60 } } : {},
-                queryOptions.petsPermited ? { petsPermited: queryOptions.petsPermited } : {},
-                queryOptions.state ? { state: queryOptions.state } : {state: { $ne: 'canceled' }}
-            ],
-        };
-        console.log(query)
         try {
-            const activities = queryOptions.price && Number.isSafeInteger(queryOptions.price) ?
-                await Activity.find(query)
-                    .select('events')
-                    .where('events.price')
-                    .lt(queryOptions.price)
-                :
-                await Activity.find(query);
-            activities.forEach(activity => { activity.events = activity?.events?.filter(event => new Date(event.date) >= new Date() && event.state!="cancelled"); });
-            return activities;
+            const { originDate, endDate, searchString, price, numPersons, minScore, language } = queryOptions;
+            let query: Query = {};
+            let match: MatchCondition = {};
+
+            // Filtro por fecha de evento
+            match['events.date'] = { $gte: originDate ? new Date(originDate) : new Date() };
+
+            if (endDate) {
+                const date = new Date(endDate);
+                date.setDate(date.getDate() + 1);
+                match['events.date'] = { ...match['events.date'], $lte: date };
+            }
+
+            // Filtro por búsqueda en nombre, localización o descripción
+            if (searchString) {
+                query.$or = [
+                    { name: { $regex: searchString, $options: 'i' } },
+                    { location: { $regex: searchString, $options: 'i' } },
+                ];
+            }
+
+            // // Filtro por precio máximo
+            if (price) {
+                match['events.price'] = { $lte: Number(price) };
+            }
+
+            // // Filtro por disponibilidad de asientos
+            if (numPersons) {
+                match['events.numPersons'] = { $gte: Number(numPersons) };
+            }
+            // Filtro por idioma
+            if (language && language.length > 0) {
+                match['events.language'] = { $in: language.split(",") };
+            }
+
+            if (minScore) {
+                match['averageScore'] = { $gte: Number(minScore) };
+            }
+
+            // Agregar el agregado para calcular la valoración media y filtrar
+            const pipeline = [
+                { $match: query },
+                {
+                    $addFields: {
+                        events: {
+                            $map: {
+                                input: "$events",
+                                as: "event",
+                                in: {
+                                    $mergeObjects: [
+                                        "$$event",
+                                        {
+                                            numPersons: {
+                                                $subtract: ["$$event.seats", "$$event.bookedSeats"]
+                                            }
+                                        }]
+                                }
+                            }
+                        }
+                    }
+                },
+                { $unwind: '$events' },
+                {
+                    $addFields: {
+                        averageScore: { $avg: "$reviews.score" },
+                    }
+                },
+                { $match: match },
+                { $group: { _id: '$_id', root: { $mergeObjects: '$$ROOT' }, events: { $push: '$events' } } },
+                { $replaceRoot: { newRoot: { $mergeObjects: ['$root', '$$ROOT'] } } },
+                { $project: { root: 0 } }
+            ];
+            console.log(queryOptions)
+            console.log(pipeline);
+
+            return await Activity.aggregate(pipeline);
         } catch (error) {
             throw {
                 status: error?.status || 500,
@@ -55,7 +126,7 @@ export default class ActivityService {
                     message: 'Actividad no encontrada'
                 }
 
-            activity.events = activity?.events?.filter(event => new Date(event.date) >= new Date() && event.state!="cancelled") || [];
+            activity.events = activity?.events?.filter(event => new Date(event.date) >= new Date() && event.state != "cancelled") || [];
 
         } catch (error) {
             throw {
@@ -86,7 +157,7 @@ export default class ActivityService {
                     message: 'Evento no encontrado'
                 }
 
-            activity.events = activity?.events?.filter(event => new Date(event.date) >= new Date() && event.state!="cancelled") || [];
+            activity.events = activity?.events?.filter(event => new Date(event.date) >= new Date() && event.state != "cancelled") || [];
 
         } catch (error) {
             throw {
@@ -106,14 +177,14 @@ export default class ActivityService {
         const today = new Date();
         today.setHours(0, 0, 0, 0); // Asegúrate de que la comparación comience desde el inicio del día actual
 
-        const activity : ActivityDoc[] = await Activity.aggregate([
+        const activity: ActivityDoc[] = await Activity.aggregate([
             { $match: { _id: new mongoose.Types.ObjectId(activityId) } },
             { $unwind: "$events" },
             { $match: { "events.date": { $gte: today } } },
             { $group: { _id: "$_id", events: { $push: "$events" } } }
         ]).exec();
 
-        if (!activity || activity.length==0)
+        if (!activity || activity.length == 0)
             throw {
                 status: 404,
                 message: "No se ha encontrado la actividad"
@@ -156,6 +227,41 @@ export default class ActivityService {
                 }
             }))
             return updatedReviews;
+        } catch (error) {
+            throw {
+                status: error.status || 500,
+                message: error.message || 'Ha habido un error en el servidor.'
+            }
+        }
+    }
+
+    getMaxPrice = async () => {
+        try {
+            const maxPrice = await Activity.aggregate([
+                { $unwind: "$events" },
+                { $match: { "events.state": { $ne: "cancelled" } } },
+                { $group: { _id: null, maxPrice: { $max: "$events.price" } } }
+            ]).exec();
+            return maxPrice[0].maxPrice;
+        } catch (error) {
+            throw {
+                status: error.status || 500,
+                message: error.message || 'Ha habido un error en el servidor.'
+            }
+        }
+    }
+
+    getPopular = async () => {
+        try {
+            const popular = await Activity.aggregate([
+                { $unwind: "$events" },
+                { $match: { "events.state": { $ne: "cancelled" } } },
+                { $group: { _id: "$_id", popularity: { $sum: { $subtract: ["$events.seats", "$events.bookedSeats"] } }, activity: { $first: "$$ROOT" } } },
+                { $sort: { popularity: -1 } },
+                { $limit: 5 },
+                { $replaceRoot: { newRoot: "$activity" } }
+            ]).exec();
+            return popular;
         } catch (error) {
             throw {
                 status: error.status || 500,
