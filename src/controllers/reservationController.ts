@@ -3,11 +3,11 @@ import { AuthenticatedRequest } from "@customTypes/autenticatedRequest";
 import { logger } from "@utils/logger";
 import ReservationService from "@services/reservationService";
 import { socket } from "@app";
-import EmailService from "@services/emailService";
+// import EmailService from "@services/emailService";
 
 export default class ReservationController {
     private reservationService: ReservationService;
-    private emailService: EmailService = new EmailService();
+    // private emailService: EmailService = new EmailService();
 
     constructor(reservationService?: ReservationService) {
         this.reservationService = reservationService || new ReservationService();
@@ -44,7 +44,7 @@ export default class ReservationController {
         }
         try {
             await this.reservationService.createReservation(reservation, intentId, userId);
-            this.emailService.sendConfirmReservationEmail(reservation);
+            // this.emailService.sendConfirmReservationEmail(reservation);
             socket.emit('reservation', req.body);
             res.status(200).json({ mesagge: "Reserva creada correctamente" });
         } catch (error) {
