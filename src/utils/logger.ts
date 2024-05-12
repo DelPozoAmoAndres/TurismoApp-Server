@@ -25,7 +25,7 @@ const loggerDefault = winston.createLogger({
             meta: true,
             format: winston.format.combine(
                 winston.format.printf(({ level, message, timestamp, ip }: { level: string, message: string, timestamp: string, ip: string }) => {
-                    return `${timestamp} [${level.toUpperCase()}] ${ip ? "(" + ip + ")" : ''} ${message} `;
+                    return /*`${timestamp} [${level.toUpperCase()}]*/ `${ip ? "(" + ip + ")" : ''} ${message} `;
                 })
             )
         })
@@ -35,7 +35,7 @@ const loggerDefault = winston.createLogger({
 let logger: any = loggerDefault;
 
 const loggerMiddleware = (req: any, res: Response, next: NextFunction) => {
-    logger = loggerDefault.child({ ip: "notData" });
+    // logger = loggerDefault.child({ ip: "notData" });
     next();
 };
 

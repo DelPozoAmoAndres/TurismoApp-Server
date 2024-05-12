@@ -256,10 +256,17 @@ export default class ActivityService {
             const popular = await Activity.aggregate([
                 { $unwind: "$events" },
                 { $match: { "events.state": { $ne: "cancelled" } } },
-                { $group: { _id: "$_id", popularity: { $sum: { $subtract: ["$events.seats", "$events.bookedSeats"] } }, activity: { $first: "$$ROOT" } } },
+                {
+                    $group: {
+                        _id: "$_id",
+                        popularity: { $sum: { $subtract: ["$events.seats", "$events.bookedSeats"] } },
+                        activity: { $first: "$$ROOT" },
+                        events: { $push: "$events" } // Push events into an array
+                    }
+                },
                 { $sort: { popularity: -1 } },
                 { $limit: 5 },
-                { $replaceRoot: { newRoot: "$activity" } }
+                { $replaceRoot: { newRoot: { $mergeObjects: ["$activity", { events: "$events" }] } } }, // Merge event and activity
             ]).exec();
             return popular;
         } catch (error) {

@@ -9,11 +9,9 @@ import { Event } from "@customTypes/event";
 import EventService from "./eventService";
 
 export default class AdminUserService {
-    private reservationService: ReservationService;
     private eventService: EventService;
 
-    constructor(reservationService?: ReservationService, eventService?: EventService) {
-        this.reservationService = reservationService || new ReservationService();
+    constructor(eventService?: EventService) {
         this.eventService = eventService || new EventService();
     }
 
@@ -164,17 +162,17 @@ export default class AdminUserService {
                     message: 'No se encontraron guias disponibles'
                 }
 
-            if(date){
-                date=date.replace("%3A",":");
+            if (date) {
+                date = date.replace("%3A", ":");
             }
-            if(time){
-                time=time.replace("%3A",":");
+            if (time) {
+                time = time.replace("%3A", ":");
             }
-            if(repeatType=="days"){
+            if (repeatType == "days") {
                 repeatDays = repeatDays.split(',')
             }
 
-            let result : User[]=[];
+            let result: User[] = [];
             for (const worker of workers) {
                 const events: Event[] = await this.eventService.getWorkerEvents(worker._id);
                 let workerIsAvailable = true;
@@ -184,14 +182,14 @@ export default class AdminUserService {
                     const eventStartTime = new Date(event.date);
                     const eventEndTime = new Date(eventStartTime.getTime() + activity.duration * 60000);
 
-                    if (repeatType=="none" && date) {
+                    if (repeatType == "none" && date) {
                         const proposedStartTime = new Date(date);
                         proposedStartTime.setHours(proposedStartTime.getHours() - MARGIN_BETWEEN_EVENTS);
                         const proposedEndTime = new Date(proposedStartTime.getTime() + activity.duration * 60000);
                         proposedEndTime.setHours(proposedEndTime.getHours() + MARGIN_BETWEEN_EVENTS);
-                        
-                        if(!(eventEndTime<proposedStartTime || proposedEndTime<eventStartTime)){
-                            workerIsAvailable=false;
+
+                        if (!(eventEndTime < proposedStartTime || proposedEndTime < eventStartTime)) {
+                            workerIsAvailable = false;
                             break;
                         }
                     } else if (repeatType === 'range' && time) {
@@ -205,8 +203,8 @@ export default class AdminUserService {
                                 proposedStartTime.setHours(proposedStartTime.getHours() - MARGIN_BETWEEN_EVENTS);
                                 const proposedEndTime = new Date(proposedStartTime.getTime() + activity.duration * 60000);
                                 proposedEndTime.setHours(proposedEndTime.getHours() + MARGIN_BETWEEN_EVENTS);
-                                if(!(eventEndTime<proposedStartTime || proposedEndTime<eventStartTime)){
-                                    workerIsAvailable=false;
+                                if (!(eventEndTime < proposedStartTime || proposedEndTime < eventStartTime)) {
+                                    workerIsAvailable = false;
                                     break;
                                 }
                             }
@@ -220,16 +218,16 @@ export default class AdminUserService {
                             const proposedEndTime = new Date(proposedStartTime.getTime() + activity.duration * 60000);
                             proposedEndTime.setHours(proposedEndTime.getHours() + MARGIN_BETWEEN_EVENTS);
 
-                            console.log(proposedStartTime,proposedEndTime,eventStartTime,eventEndTime);
-                                console.log(eventEndTime<proposedStartTime,proposedEndTime<eventEndTime);
-                            if(!(eventEndTime<proposedStartTime || proposedEndTime<eventStartTime)){
-                                workerIsAvailable=false;
+                            console.log(proposedStartTime, proposedEndTime, eventStartTime, eventEndTime);
+                            console.log(eventEndTime < proposedStartTime, proposedEndTime < eventEndTime);
+                            if (!(eventEndTime < proposedStartTime || proposedEndTime < eventStartTime)) {
+                                workerIsAvailable = false;
                                 break;
                             }
                         }
                     }
                 }
-                if(workerIsAvailable){
+                if (workerIsAvailable) {
                     result.push(worker);
                 }
             };

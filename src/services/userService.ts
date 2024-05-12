@@ -2,12 +2,8 @@ import { User } from "@customTypes/user";
 import UserScheme from "@models/userSchema";
 import bcrypt from 'bcrypt';
 
-const projection = {
-    password: 0,
-};
-
 export default class UserService {
-    getOneUser = async (userId: string) => {
+    getOneUser = async (userId: string, projection: Record<string, unknown> = { password: 0 }) => {
         let user: User;
         try {
             user = await UserScheme.findById(userId, projection)
@@ -46,7 +42,7 @@ export default class UserService {
     changePassword = async (userId: string, oldPass: string, newPass: string) => {
         let user: User;
         try {
-            user = await this.getOneUser(userId)
+            user = await this.getOneUser(userId, { "__V": 0 })
         } catch (error) {
             throw {
                 status: error?.status || 500,
@@ -54,6 +50,7 @@ export default class UserService {
             }
         }
         const isMatch = await bcrypt.compareSync(oldPass, user.password);
+        console.log(isMatch)
         if (!isMatch)
             throw {
                 status: 304,
@@ -66,7 +63,7 @@ export default class UserService {
                 { $set: { password: hashedPassword } },
                 { new: true }
             );
-        }catch(error){
+        } catch (error) {
             throw {
                 status: error?.status || 500,
                 message: error?.message || 'Ha habido un error en el servidor.'
