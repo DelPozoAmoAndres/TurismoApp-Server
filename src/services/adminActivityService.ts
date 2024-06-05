@@ -7,6 +7,10 @@ import ActivivityScheme from "@models/activitySchema";
 import User from "@models/userSchema";
 import ActivitySchema from "@models/activitySchema";
 
+interface Query {
+    $or?: { [key: string]: any }[];
+}
+
 export default class AdminActivityService {
     addActivity = async (newActivity: ActivityDoc) => {
         try {
@@ -107,14 +111,14 @@ export default class AdminActivityService {
         }
     }
     deleteReview = async (activityId: string, reviewId: string) => {
-        if(!mongoose.Types.ObjectId.isValid(activityId)){
+        if (!mongoose.Types.ObjectId.isValid(activityId)) {
             throw {
                 status: 400,
                 message: 'El id de la actividad es invalido'
             }
         }
 
-        if(!mongoose.Types.ObjectId.isValid(reviewId)){
+        if (!mongoose.Types.ObjectId.isValid(reviewId)) {
             throw {
                 status: 400,
                 message: 'El id de la review es invalido'
@@ -122,11 +126,11 @@ export default class AdminActivityService {
         }
         try {
             const activity = await ActivivityScheme.findOneAndUpdate(
-                { _id: activityId }, 
+                { _id: activityId },
                 { $pull: { reviews: { _id: reviewId } } },
-                { new: true } 
+                { new: true }
             );
-    
+
             if (!activity)
                 throw {
                     status: 404,
@@ -142,29 +146,20 @@ export default class AdminActivityService {
     }
 
     getAllActivities = async (queryOptions: QueryOptions) => {
-        let query = {
-            $and: [
-                queryOptions.searchString ? {
-                    $or: [
-                        { name: { $regex: queryOptions.searchString, $options: 'i' } },
-                        { description: { $regex: queryOptions.searchString, $options: 'i' } },
-                        { location: { $regex: queryOptions.searchString, $options: 'i' } }
-                    ]
-                } : {},
-                queryOptions.duration && Number.isSafeInteger(queryOptions.duration) ? { duration: { $lt: Number(queryOptions.duration) * 60 } } : {},
-                queryOptions.petsPermited ? { petsPermited: queryOptions.petsPermited } : {},
-                queryOptions.state ? { state: queryOptions.state } : {}
-            ],
-        };
-        console.log(query)
+        let query: Query = {};
+
+        if (queryOptions.searchString) {
+            query.$or = [
+                { name: { $regex: queryOptions.searchString, $options: 'i' } },
+                { location: { $regex: queryOptions.searchString, $options: 'i' } },
+            ];
+            if (mongoose.isValidObjectId(queryOptions.searchString)) {
+                query.$or.push({ _id: new mongoose.Types.ObjectId(queryOptions.searchString) });
+            }
+        }
+
         try {
-            const activities = queryOptions.price && Number.isSafeInteger(queryOptions.price) ?
-                await ActivitySchema.find(query)
-                    .select('events')
-                    .where('events.price')
-                    .lt(queryOptions.price)
-                :
-                await ActivitySchema.find(query);
+            const activities = await ActivitySchema.find(query);
             return activities;
         } catch (error) {
             throw {

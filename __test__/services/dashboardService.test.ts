@@ -100,16 +100,16 @@ describe('Get total income', () => {
 describe('Get occupation', () => {
     let dashboardService: DashboardService;
 
-    let occupationPoints :{day:number,occupationRatio:number}[] =[]
+    let occupationPoints: { day: number, occupationRatio: number }[] = []
 
     beforeAll(() => {
 
-        for(let i = 1; i<=30;i++){
-            if(i==1 || i==2){
-                occupationPoints.push({day:i,occupationRatio:50})
+        for (let i = 1; i <= 30; i++) {
+            if (i == 1 || i == 2) {
+                occupationPoints.push({ day: i, occupationRatio: 50 })
                 continue;
             }
-            occupationPoints.push({day:i,occupationRatio:0})
+            occupationPoints.push({ day: i, occupationRatio: 0 })
         }
 
         dashboardService = new DashboardService();
@@ -223,7 +223,6 @@ describe('Get category reservations', () => {
                 categoryReservations.push({ category: category, reservationsRate: 100 })
                 continue;
             }
-            categoryReservations.push({ category: category, reservationsRate: 0 })
         }
 
         dashboardService = new DashboardService();

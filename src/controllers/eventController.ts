@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import { logger } from "../utils/logger";
 import EventService from "@services/eventService";
 import { socket } from "@app";
+import mongoose from "mongoose";
 
 export default class EventController {
     private eventService: EventService;

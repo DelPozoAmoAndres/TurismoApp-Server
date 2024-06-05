@@ -50,7 +50,6 @@ export default class UserService {
             }
         }
         const isMatch = await bcrypt.compareSync(oldPass, user.password);
-        console.log(isMatch)
         if (!isMatch)
             throw {
                 status: 304,

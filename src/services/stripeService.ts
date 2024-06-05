@@ -45,16 +45,16 @@ export default class StripeService implements PaymentService {
     });;
   };
 
-  cancelPayment = async (paymentIntentId: string) => {
-    const paymentIntent = await this.stripe.paymentIntents.retrieve(paymentIntentId);
-    if (paymentIntent.status === "requires_payment_method")
-      await this.stripe.paymentIntents.cancel(paymentIntentId)
-    else
-      await this.stripe.refunds.create({ charge: paymentIntent.latest_charge.toString() });
-    const user = await UserSchema.findOneAndUpdate({ "reservations.paymentId": paymentIntentId }, { $set: { "reservations.$.state": "canceled" } }, { new: true }).exec();
-    console.log("user", user)
+  cancelPayment = async (paymentIntentId: string, refund: boolean) => {
+    if (refund) {
+      const paymentIntent = await this.stripe.paymentIntents.retrieve(paymentIntentId);
+      if (paymentIntent.status === "requires_payment_method")
+        await this.stripe.paymentIntents.cancel(paymentIntentId)
+      else
+        await this.stripe.refunds.create({ charge: paymentIntent.latest_charge.toString() });
+    }
+    const user = await UserSchema.findOneAndUpdate({ "reservations.paymentId": paymentIntentId }, { $set: { "reservations.$.state": "canceled", "reservations.$.date": new Date() } }, { new: true }).exec();
     const reservation = user.reservations.filter(reservation => reservation.paymentId === paymentIntentId)[0];
-    console.log("reservation", reservation)
     await ActivitySchema.findOneAndUpdate({ "events._id": reservation.eventId }, { $inc: { "events.$.bookedSeats": - reservation.numPersons } }).exec();
   }
 

@@ -124,8 +124,48 @@ export default class ReservationService {
                     status: 400,
                     message: 'La reserva ya ha sido cancelada.'
                 };
-            await this.paymentService.cancelPayment(reservation.paymentId)
+
+            const activity = await Activity.findOne({ "events._id": reservation.eventId, "events.$": 1 });
+            if (!activity)
+                throw {
+                    status: 404,
+                    message: 'La actividad no existe.'
+                };
+            const date = activity.events[0].date
+            const refund = (date.getTime() - Number(Date.now)) > 24 * 60 * 60 * 1000
+
+            await this.paymentService.cancelPayment(reservation.paymentId, refund)
             await user.save();
+        } catch (error) {
+            throw {
+                status: error.status || 500,
+                message: error.message || 'Ha habido un error en el servidor.'
+            };
+        }
+    }
+
+    public cancelReservationWithReturn = async (reservationId: string) => {
+        if (!mongoose.Types.ObjectId.isValid(reservationId))
+            throw { status: 400, message: 'El id de la reserva no es válido.' };
+        try {
+            const user = await User.findOne(
+                { 'reservations._id': reservationId },
+                { 'reservations.$': 1 });
+
+            if (!user || !user.reservations || user.reservations.length == 0) {
+                throw {
+                    status: 404,
+                    message: 'La reserva no existe.'
+                };
+            }
+
+            const reservation = user.reservations[0];
+            if (reservation.state == 'canceled')
+                throw {
+                    status: 400,
+                    message: 'La reserva ya ha sido cancelada.'
+                };
+            await this.paymentService.cancelPayment(reservation.paymentId, true)
         } catch (error) {
             throw {
                 status: error.status || 500,
@@ -141,7 +181,6 @@ export default class ReservationService {
         let activity: ActivityDoc = await Activity.findOne({ "events._id": eventId });
         reservationMap.event = activity?.events?.find((event) => event.id == eventId)
         const status = await this.paymentService.verifyStatus(reservationMap.paymentId);
-        console.log("hola", reservationMap.event.date)
         if (reservationMap.event.date < new Date() && status == "success")
             reservationMap.state = "completed"
         else

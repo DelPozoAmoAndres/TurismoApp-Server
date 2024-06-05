@@ -38,20 +38,22 @@ export default class AdminUserService {
         }
     }
     getAllUsers = async (queryOptions: QueryOptions) => {
-        let query: QueryOptions;
+        let query: QueryOptions = {};
+
         try {
-            query = {
-                $and: [
-                    queryOptions.searchString ? {
-                        $or: [
-                            { name: { $regex: queryOptions.searchString, $options: 'i' } }, // Buscar en la propiedad "name"
-                            { email: { $regex: queryOptions.searchString, $options: 'i' } },// Buscar en la propiedad "email"
-                        ]
-                    } : {},
-                    queryOptions.country ? { country: { $regex: queryOptions.country, $options: 'i' } } : {}, // Buscar en la propiedad "country"
-                    queryOptions.role ? { role: { $regex: queryOptions.role, $options: 'i' } } : {}, // Buscar en la propiedad "email"
-                ],
-            };
+            if (queryOptions.searchString) {
+                query = {
+                    $or: [
+                        { name: { $regex: queryOptions.searchString, $options: 'i' } }, // Buscar en la propiedad "name"
+                        { email: { $regex: queryOptions.searchString, $options: 'i' } },// Buscar en la propiedad "email"
+                    ]
+                };
+            }
+
+            if (mongoose.isValidObjectId(queryOptions.searchString)) {
+                query.$or.push({ _id: new mongoose.Types.ObjectId(queryOptions.searchString) });
+            }
+
         } catch (error) {
             throw {
                 status: 400,
@@ -128,7 +130,6 @@ export default class AdminUserService {
                     status: 400,
                     message: 'El id no es válido'
                 }
-            console.log(changes)
             const userUpdated = await UserScheme.findByIdAndUpdate(userId, changes, { new: true, runValidators: true })
             if (!userUpdated)
                 throw {
@@ -181,13 +182,14 @@ export default class AdminUserService {
                     const activity = await ActivitySchema.findOne({ "events._id": event.id });
                     const eventStartTime = new Date(event.date);
                     const eventEndTime = new Date(eventStartTime.getTime() + activity.duration * 60000);
+                    console.log(eventStartTime, eventEndTime, event)
 
                     if (repeatType == "none" && date) {
                         const proposedStartTime = new Date(date);
                         proposedStartTime.setHours(proposedStartTime.getHours() - MARGIN_BETWEEN_EVENTS);
                         const proposedEndTime = new Date(proposedStartTime.getTime() + activity.duration * 60000);
                         proposedEndTime.setHours(proposedEndTime.getHours() + MARGIN_BETWEEN_EVENTS);
-
+                        console.log(proposedStartTime, eventStartTime);
                         if (!(eventEndTime < proposedStartTime || proposedEndTime < eventStartTime)) {
                             workerIsAvailable = false;
                             break;
@@ -218,8 +220,6 @@ export default class AdminUserService {
                             const proposedEndTime = new Date(proposedStartTime.getTime() + activity.duration * 60000);
                             proposedEndTime.setHours(proposedEndTime.getHours() + MARGIN_BETWEEN_EVENTS);
 
-                            console.log(proposedStartTime, proposedEndTime, eventStartTime, eventEndTime);
-                            console.log(eventEndTime < proposedStartTime, proposedEndTime < eventEndTime);
                             if (!(eventEndTime < proposedStartTime || proposedEndTime < eventStartTime)) {
                                 workerIsAvailable = false;
                                 break;

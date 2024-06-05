@@ -69,7 +69,6 @@ UserScheme.pre<User>('deleteOne', async function () {
 
     if (user && user.reservations) {
         const reservations = user.reservations.filter(reservation => reservation.state === 'success');
-        console.log(user.reservations);
 
         for (let i = 0; i < reservations.length; i++) {
             const reservation = reservations[i];

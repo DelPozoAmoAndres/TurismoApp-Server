@@ -6,7 +6,7 @@ import AdminUserService from "@services/adminUserService";
 import ReservationService from "@services/reservationService";
 
 export default class AdminUserController {
-    
+
     private adminUserService: AdminUserService;
     private reservationService: ReservationService;
 
@@ -115,6 +115,18 @@ export default class AdminUserController {
             res.status(200).json(workers);
         } catch (error) {
             logger.error('[GetWorkers] Ha ocurrido un error en el servidor durante la búsqueda de los trabajadores', error);
+            res.status(error?.status || 500).json({ message: error?.message || 'Ha habido un error en el servidor.' });
+        }
+    }
+
+    cancelReservation = async (req: Request, res: Response) => {
+        const { params: { id } } = req;
+        try {
+            await this.reservationService.cancelReservationWithReturn(id);
+            socket.emit('update', req.body);
+            res.status(200).json({ message: 'Reserva cancelada correctamente.' });
+        } catch (error) {
+            logger.error('[CancelReservation] Ha ocurrido un error en el servidor durante la cancelación de la reserva', error);
             res.status(error?.status || 500).json({ message: error?.message || 'Ha habido un error en el servidor.' });
         }
     }

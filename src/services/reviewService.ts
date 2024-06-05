@@ -55,7 +55,6 @@ export default class ReviewService {
 
             review.author = userId;
             activity?.reviews ? activity.reviews.push(review) : activity.reviews = [review]
-            console.log(activity.reviews,review,userId)
             if (activity.validateSync())
                 throw {
                     status: 400,

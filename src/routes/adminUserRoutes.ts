@@ -12,6 +12,7 @@ router
     .put('/:id', adminUserController.editUser)
     .get('/:id/reservation/list', adminUserController.getUserReservations)
     .get('/reservation/list', adminUserController.getAllReservations)
-    
+    .delete('/reservation/:id/cancel/', adminUserController.cancelReservation)
+
 
 export default router

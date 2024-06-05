@@ -1,6 +1,6 @@
 import { Response, Request } from "express";
 import { logger } from "@utils/logger";
-import DashboardService  from "@services/dashboardService";
+import DashboardService from "@services/dashboardService";
 
 export default class DashboardController {
     private dashboardService: DashboardService;
@@ -9,9 +9,9 @@ export default class DashboardController {
         this.dashboardService = dashboardService || new DashboardService();
     }
 
-    getTotalReservations = async (req: Request, res: Response) => {
+    getConfirmedReservations = async (req: Request, res: Response) => {
         try {
-            const totalReservations = await this.dashboardService.getTotalReservations();
+            const totalReservations = await this.dashboardService.getConfirmedReservations();
             res.status(200).json(totalReservations);
         } catch (error) {
             logger.error('[GetTotalReservations] Ha ocurrido un error en el servidor durante la obtención de las reservas.', error);
@@ -72,12 +72,12 @@ export default class DashboardController {
     getResume = async (req: Request, res: Response) => {
         try {
             const resume = {
-                "totalReservations": await this.dashboardService.getTotalReservations(),
+                "totalReservations": await this.dashboardService.getConfirmedReservations(),
                 "totalIncome": await this.dashboardService.getTotalIncome(),
                 "occupationData": await this.dashboardService.getOccupation(),
                 "totalUsers": await this.dashboardService.getTotalUsers(),
                 "cancelationData": await this.dashboardService.getCancelationRate(),
-                "categoryReservations" : await this.dashboardService.getCategoryReservations()
+                "categoryReservations": await this.dashboardService.getCategoryReservations()
             }
             res.status(200).json(resume);
         } catch (error) {

@@ -73,8 +73,12 @@ export default class EventService {
 
         let events;
         try {
-            //devolver solo aquellos eventos cuando el trabajador es el guía
-            events = await ActivitySchema.find({ "events.guide": workerId })
+            events = await ActivitySchema.aggregate([
+                { $unwind: "$events" },
+                { $match: { "events.guide": workerId.toString() } },
+                { $group: { _id: "$_id", events: { $push: "$events" } } }
+            ]);
+
             if (!events)
                 throw {
                     status: 404,
@@ -87,7 +91,8 @@ export default class EventService {
                 message: error?.message || 'Ha habido un error en el servidor.'
             }
         }
-        return events.flatMap((event: any) => event.events.filter((e: Event) => e.guide === workerId.toString() && e.state !== "cancelled"));
+        let result = events.flatMap((event: any) => event.events.filter((e: any) => e.state !== "cancelled")).map((event: any) => { event.id = event._id; return event })
+        return result;
     }
 
     getEvents = async (search: string, filters: Record<string, unknown>) => {
@@ -129,12 +134,14 @@ export default class EventService {
                     let targetEvent = activity.events.find((event) => event.id == eventId);
                     let eventsToDelete = body.recurrenceDays.length > 0 ? activity.events.filter(
                         (event: Event) =>
-                            event.guide == targetEvent.guide
+                            event.guide === targetEvent.guide
                             && new Date(event.date) >= startDate
                             && new Date(event.date) <= endDate
                             && new Date(event.date).getHours() === new Date(targetEvent.date).getHours()
                             && new Date(event.date).getMinutes() === new Date(targetEvent.date).getMinutes()
+                            && event.language == targetEvent.language
                             && body.recurrenceDays.includes(new Date(event.date).getDay())
+                            && event.state !== "cancelled"
                     ) : [targetEvent];
                     await UserSchema.find({ 'reservations.eventId': { $in: eventsToDelete.map((event: Event) => event.id) }, 'reservations.state': 'success' }).
                         then(async (users) => {
@@ -177,7 +184,6 @@ export default class EventService {
 
                     targetEvent.guide = body.guide || targetEvent.guide;
                     targetEvent.seats = body.seats || targetEvent.seats;
-                    console.log(targetEvent);
                     await ActivitySchema.updateOne(
                         { "events._id": eventId },
                         { $set: { "events.$": targetEvent } }

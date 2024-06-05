@@ -28,7 +28,7 @@ import EventService from "@services/eventService";
 import { RecurrentEventDeleteRequest } from "@customTypes/RecurrentEventDeleteRequest";
 
 describe('Get one event', () => {
-    let eventService : EventService;
+    let eventService: EventService;
 
     beforeAll(() => {
         eventService = new EventService();
@@ -39,15 +39,15 @@ describe('Get one event', () => {
     });
 
     describe('when the event id is valid', () => {
-        const event= {id: '123', name: 'event', date: '2021-12-12', price: 100}
-            beforeAll(() => {
-                mockedMongoose.Types.ObjectId.isValid = jest.fn().mockReturnValue(true);
-                mockedActivitySchema.find = jest.fn().mockResolvedValue([{events: [event]}]);
-            })
-        test('should return a event',async ()=>{
+        const event = { id: '123', name: 'event', date: '2021-12-12', price: 100 }
+        beforeAll(() => {
+            mockedMongoose.Types.ObjectId.isValid = jest.fn().mockReturnValue(true);
+            mockedActivitySchema.find = jest.fn().mockResolvedValue([{ events: [event] }]);
+        })
+        test('should return a event', async () => {
             const result = await eventService.getOneEvent('123');
             expect(result).toEqual(event);
-            
+
         });
     });
 
@@ -55,8 +55,8 @@ describe('Get one event', () => {
         beforeAll(() => {
             mockedMongoose.Types.ObjectId.isValid = jest.fn().mockReturnValue(false);
         })
-        test('should throw an error',async ()=>{
-            await expect(eventService.getOneEvent('123')).rejects.toMatchObject({status: 400, message: 'El identificador del evento no es válido'});
+        test('should throw an error', async () => {
+            await expect(eventService.getOneEvent('123')).rejects.toMatchObject({ status: 400, message: 'El identificador del evento no es válido' });
         });
     });
 
@@ -65,8 +65,8 @@ describe('Get one event', () => {
             mockedMongoose.Types.ObjectId.isValid = jest.fn().mockReturnValue(true);
             mockedActivitySchema.find = jest.fn().mockResolvedValue([]);
         })
-        test('should throw an error',async ()=>{
-            await expect(eventService.getOneEvent('123')).rejects.toMatchObject({status: 404, message: 'Evento no encontrado'});
+        test('should throw an error', async () => {
+            await expect(eventService.getOneEvent('123')).rejects.toMatchObject({ status: 404, message: 'Evento no encontrado' });
         });
     });
 
@@ -75,8 +75,8 @@ describe('Get one event', () => {
             mockedMongoose.Types.ObjectId.isValid = jest.fn().mockReturnValue(true);
             mockedActivitySchema.find = jest.fn().mockRejectedValue(new Error());
         })
-        test('should throw an error',async ()=>{
-            await expect(eventService.getOneEvent('123')).rejects.toMatchObject({status: 500, message: 'Ha habido un error en el servidor.'});
+        test('should throw an error', async () => {
+            await expect(eventService.getOneEvent('123')).rejects.toMatchObject({ status: 500, message: 'Ha habido un error en el servidor.' });
         });
     });
 
@@ -86,14 +86,14 @@ describe('Get one event', () => {
             mockedMongoose.Types.ObjectId.isValid = jest.fn().mockReturnValue(true);
             mockedActivitySchema.find = jest.fn().mockRejectedValue(error);
         });
-        test('should throw an error',async ()=>{
-            await expect(eventService.getOneEvent('123')).rejects.toMatchObject({status: 400, message: error.message});
+        test('should throw an error', async () => {
+            await expect(eventService.getOneEvent('123')).rejects.toMatchObject({ status: 400, message: error.message });
         });
     });
 });
 
 describe('Get participants', () => {
-    let eventService : EventService;
+    let eventService: EventService;
 
     beforeAll(() => {
         eventService = new EventService();
@@ -104,18 +104,18 @@ describe('Get participants', () => {
     });
 
     describe('when the event id is valid', () => {
-        const participants = [{eventId: '123', state: 'success'}]
+        const participants = [{ eventId: '123', state: 'success' }]
 
         beforeAll(() => {
             mockedMongoose.Types.ObjectId.isValid = jest.fn().mockReturnValue(true);
-            mockedActivitySchema.findOne = jest.fn().mockResolvedValue({ejemplo:'ejemplo'});
-            mockedUserSchema.find = jest.fn().mockResolvedValue([{reservations: [{eventId: '123', state: 'success'}]}]);
+            mockedActivitySchema.findOne = jest.fn().mockResolvedValue({ ejemplo: 'ejemplo' });
+            mockedUserSchema.find = jest.fn().mockResolvedValue([{ reservations: [{ eventId: '123', state: 'success' }] }]);
         })
 
-        test('should return a event',async ()=>{
+        test('should return a event', async () => {
             const result = await eventService.getParticipants('123');
             expect(result).toEqual(participants);
-            
+
         });
     });
 
@@ -123,30 +123,30 @@ describe('Get participants', () => {
         beforeAll(() => {
             mockedMongoose.Types.ObjectId.isValid = jest.fn().mockReturnValue(false);
         })
-        test('should throw an error',async ()=>{
-            await expect(eventService.getParticipants('123')).rejects.toMatchObject({status: 400, message: 'El identificador del evento no es válido'});
+        test('should throw an error', async () => {
+            await expect(eventService.getParticipants('123')).rejects.toMatchObject({ status: 400, message: 'El identificador del evento no es válido' });
         });
     });
 
     describe('when there arent any reservations', () => {
         beforeAll(() => {
             mockedMongoose.Types.ObjectId.isValid = jest.fn().mockReturnValue(true);
-            mockedActivitySchema.findOne = jest.fn().mockResolvedValue({ejemplo:'ejemplo'});
+            mockedActivitySchema.findOne = jest.fn().mockResolvedValue({ ejemplo: 'ejemplo' });
             mockedUserSchema.find = jest.fn().mockResolvedValue(null);
         })
-        test('should throw an error',async ()=>{
-            await expect(eventService.getParticipants('123')).rejects.toMatchObject({status: 404, message: 'Evento no encontrado'});
+        test('should throw an error', async () => {
+            await expect(eventService.getParticipants('123')).rejects.toMatchObject({ status: 404, message: 'Evento no encontrado' });
         });
     });
 
     describe('when there is a default error', () => {
         beforeAll(() => {
             mockedMongoose.Types.ObjectId.isValid = jest.fn().mockReturnValue(true);
-            mockedActivitySchema.findOne = jest.fn().mockResolvedValue({ejemplo:'ejemplo'});
+            mockedActivitySchema.findOne = jest.fn().mockResolvedValue({ ejemplo: 'ejemplo' });
             mockedUserSchema.find = jest.fn().mockRejectedValue(new Error());
         })
-        test('should throw an error',async ()=>{
-            await expect(eventService.getParticipants('123')).rejects.toMatchObject({status: 500, message: 'Ha habido un error en el servidor.'});
+        test('should throw an error', async () => {
+            await expect(eventService.getParticipants('123')).rejects.toMatchObject({ status: 500, message: 'Ha habido un error en el servidor.' });
         });
     });
 
@@ -154,17 +154,17 @@ describe('Get participants', () => {
         const error = { status: 400, message: 'Error' }
         beforeAll(() => {
             mockedMongoose.Types.ObjectId.isValid = jest.fn().mockReturnValue(true);
-            mockedActivitySchema.findOne = jest.fn().mockResolvedValue({ejemplo:'ejemplo'});
+            mockedActivitySchema.findOne = jest.fn().mockResolvedValue({ ejemplo: 'ejemplo' });
             mockedUserSchema.find = jest.fn().mockRejectedValue(error);
         });
-        test('should throw an error',async ()=>{
-            await expect(eventService.getParticipants('123')).rejects.toMatchObject({status: 400, message: error.message});
+        test('should throw an error', async () => {
+            await expect(eventService.getParticipants('123')).rejects.toMatchObject({ status: 400, message: error.message });
         });
     });
 });
 
 describe('Get worker events', () => {
-    let eventService : EventService;
+    let eventService: EventService;
 
     beforeAll(() => {
         eventService = new EventService();
@@ -175,17 +175,18 @@ describe('Get worker events', () => {
     });
 
     describe('when the worker id is valid', () => {
-        const events = [{id: '123', name: 'event', date: '2021-12-12', price: 100, guide: '123', state: 'success'}]
+        const events = [{ id: '123', name: 'event', date: '2025-12-20', price: 100, guide: '123', state: 'success' }]
 
         beforeAll(() => {
             mockedMongoose.Types.ObjectId.isValid = jest.fn().mockReturnValue(true);
-            mockedActivitySchema.find = jest.fn().mockResolvedValue([{events:events}]);
+
+            mockedActivitySchema.aggregate = jest.fn().mockResolvedValue([{ events: events }]);
         })
 
-        test('should return a event',async ()=>{
+        test('should return a event', async () => {
             const result = await eventService.getWorkerEvents('123');
             expect(result).toEqual(events);
-            
+
         });
     });
 
@@ -193,18 +194,18 @@ describe('Get worker events', () => {
         beforeAll(() => {
             mockedMongoose.Types.ObjectId.isValid = jest.fn().mockReturnValue(false);
         })
-        test('should throw an error',async ()=>{
-            await expect(eventService.getWorkerEvents('123')).rejects.toMatchObject({status: 400, message: 'El identificador del trabajador no es válido'});
+        test('should throw an error', async () => {
+            await expect(eventService.getWorkerEvents('123')).rejects.toMatchObject({ status: 400, message: 'El identificador del trabajador no es válido' });
         });
     });
 
     describe('when there is a default error', () => {
         beforeAll(() => {
             mockedMongoose.Types.ObjectId.isValid = jest.fn().mockReturnValue(true);
-            mockedActivitySchema.find = jest.fn().mockRejectedValue(new Error());
+            mockedActivitySchema.aggregate = jest.fn().mockRejectedValue(new Error());
         })
-        test('should throw an error',async ()=>{
-            await expect(eventService.getWorkerEvents('123')).rejects.toMatchObject({status: 500, message: 'Ha habido un error en el servidor.'});
+        test('should throw an error', async () => {
+            await expect(eventService.getWorkerEvents('123')).rejects.toMatchObject({ status: 500, message: 'Ha habido un error en el servidor.' });
         });
     });
 
@@ -212,16 +213,16 @@ describe('Get worker events', () => {
         const error = { status: 400, message: 'Error' }
         beforeAll(() => {
             mockedMongoose.Types.ObjectId.isValid = jest.fn().mockReturnValue(true);
-            mockedActivitySchema.find = jest.fn().mockRejectedValue(error);
+            mockedActivitySchema.aggregate = jest.fn().mockRejectedValue(error);
         });
-        test('should throw an error',async ()=>{
-            await expect(eventService.getWorkerEvents('123')).rejects.toMatchObject({status: 400, message: error.message});
+        test('should throw an error', async () => {
+            await expect(eventService.getWorkerEvents('123')).rejects.toMatchObject({ status: 400, message: error.message });
         });
     });
 });
 
 describe('Get all events', () => {
-    let eventService : EventService;
+    let eventService: EventService;
 
     beforeAll(() => {
         eventService = new EventService();
@@ -232,16 +233,16 @@ describe('Get all events', () => {
     });
 
     describe('when there are events', () => {
-        const events = [{id: '123', name: 'event', date: '2021-12-12', price: 100, guide: '123', state: 'success'}]
+        const events = [{ id: '123', name: 'event', date: '2021-12-12', price: 100, guide: '123', state: 'success' }]
 
         beforeAll(() => {
-            mockedActivitySchema.find = jest.fn().mockResolvedValue([{events:events}]);
+            mockedActivitySchema.find = jest.fn().mockResolvedValue([{ events: events }]);
         })
 
-        test('should return a event',async ()=>{
-            const result = await eventService.getEvents("",{});
+        test('should return a event', async () => {
+            const result = await eventService.getEvents("", {});
             expect(result).toEqual(events);
-            
+
         });
     });
 
@@ -249,8 +250,8 @@ describe('Get all events', () => {
         beforeAll(() => {
             mockedActivitySchema.find = jest.fn().mockRejectedValue(new Error());
         })
-        test('should throw an error',async ()=>{
-            await expect(eventService.getEvents("",{})).rejects.toMatchObject({status: 500, message: 'Ha habido un error en el servidor.'});
+        test('should throw an error', async () => {
+            await expect(eventService.getEvents("", {})).rejects.toMatchObject({ status: 500, message: 'Ha habido un error en el servidor.' });
         });
     });
 
@@ -259,14 +260,14 @@ describe('Get all events', () => {
         beforeAll(() => {
             mockedActivitySchema.find = jest.fn().mockRejectedValue(error);
         });
-        test('should throw an error',async ()=>{
-            await expect(eventService.getEvents("",{})).rejects.toMatchObject({status: 400, message: error.message});
+        test('should throw an error', async () => {
+            await expect(eventService.getEvents("", {})).rejects.toMatchObject({ status: 400, message: error.message });
         });
     });
 });
 
 describe('Delete events', () => {
-    let eventService : EventService;
+    let eventService: EventService;
 
     beforeAll(() => {
         mockedReservationService.prototype.cancelReservation = jest.fn();
@@ -279,19 +280,19 @@ describe('Delete events', () => {
 
     describe('when the event id is valid', () => {
 
-        const recurrentEventDelete : RecurrentEventDeleteRequest = {startDate: new Date(), endDate: new Date(), recurrenceDays: [1,2,3]};
-        const mockedUsers = [{_id:"a",reservations:[{_id:"a",eventId:'ejemplo'}],save: jest.fn()}]
+        const recurrentEventDelete: RecurrentEventDeleteRequest = { startDate: new Date(), endDate: new Date(), recurrenceDays: [1, 2, 3] };
+        const mockedUsers = [{ _id: "a", reservations: [{ _id: "a", eventId: 'ejemplo' }], save: jest.fn() }]
         beforeAll(() => {
             mockedMongoose.Types.ObjectId.isValid = jest.fn().mockReturnValue(true);
-            mockedActivitySchema.findOne = jest.fn().mockResolvedValue({events:[{id:'123'}]});
+            mockedActivitySchema.findOne = jest.fn().mockResolvedValue({ events: [{ id: '123' }] });
             mockedUserSchema.find = jest.fn().mockResolvedValue(mockedUsers);
             mockedActivitySchema.updateMany = jest.fn();
         })
 
-        test('should return a event',async ()=>{
-            const result = await eventService.deleteEvents('123',recurrentEventDelete);
+        test('should return a event', async () => {
+            const result = await eventService.deleteEvents('123', recurrentEventDelete);
             expect(mockedUsers[0].save).toBeCalled();
-            
+
         });
     });
 
@@ -299,8 +300,8 @@ describe('Delete events', () => {
         beforeAll(() => {
             mockedMongoose.Types.ObjectId.isValid = jest.fn().mockReturnValue(false);
         })
-        test('should throw an error',async ()=>{
-            await expect(eventService.deleteEvents('123',{startDate: new Date(), endDate: new Date(), recurrenceDays: [1,2,3]})).rejects.toMatchObject({status: 400, message: 'El identificador del evento no es válido'});
+        test('should throw an error', async () => {
+            await expect(eventService.deleteEvents('123', { startDate: new Date(), endDate: new Date(), recurrenceDays: [1, 2, 3] })).rejects.toMatchObject({ status: 400, message: 'El identificador del evento no es válido' });
         });
     });
 
@@ -309,8 +310,8 @@ describe('Delete events', () => {
             mockedMongoose.Types.ObjectId.isValid = jest.fn().mockReturnValue(true);
             mockedActivitySchema.findOne = jest.fn().mockRejectedValue(new Error());
         })
-        test('should throw an error',async ()=>{
-            await expect(eventService.deleteEvents('123',{startDate: new Date(), endDate: new Date(), recurrenceDays: [1,2,3]})).rejects.toMatchObject({status: 500, message: 'Ha habido un error en el servidor.'});
+        test('should throw an error', async () => {
+            await expect(eventService.deleteEvents('123', { startDate: new Date(), endDate: new Date(), recurrenceDays: [1, 2, 3] })).rejects.toMatchObject({ status: 500, message: 'Ha habido un error en el servidor.' });
         });
     });
 
@@ -320,8 +321,8 @@ describe('Delete events', () => {
             mockedMongoose.Types.ObjectId.isValid = jest.fn().mockReturnValue(true);
             mockedActivitySchema.findOne = jest.fn().mockRejectedValue(error);
         });
-        test('should throw an error',async ()=>{
-            await expect(eventService.deleteEvents('123',{startDate: new Date(), endDate: new Date(), recurrenceDays: [1,2,3]})).rejects.toMatchObject({status: 400, message: error.message});
+        test('should throw an error', async () => {
+            await expect(eventService.deleteEvents('123', { startDate: new Date(), endDate: new Date(), recurrenceDays: [1, 2, 3] })).rejects.toMatchObject({ status: 400, message: error.message });
         });
     });
 

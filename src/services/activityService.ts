@@ -2,6 +2,8 @@ import mongoose from "mongoose";
 import Activity from "@models/activitySchema";
 import { ActivityDoc } from "@customTypes/activity";
 import User from "@models/userSchema";
+import { Event } from "@customTypes/event";
+import ActivitySchema from "@models/activitySchema";
 
 interface QueryOptions {
     originDate?: string;
@@ -97,8 +99,6 @@ export default class ActivityService {
                 { $replaceRoot: { newRoot: { $mergeObjects: ['$root', '$$ROOT'] } } },
                 { $project: { root: 0 } }
             ];
-            console.log(queryOptions)
-            console.log(pipeline);
 
             return await Activity.aggregate(pipeline);
         } catch (error) {
@@ -125,9 +125,7 @@ export default class ActivityService {
                     status: 404,
                     message: 'Actividad no encontrada'
                 }
-
             activity.events = activity?.events?.filter(event => new Date(event.date) >= new Date() && event.state != "cancelled") || [];
-
         } catch (error) {
             throw {
                 status: error?.status || 500,
@@ -252,6 +250,7 @@ export default class ActivityService {
     }
 
     getPopular = async () => {
+        console.log("POPULARES")
         try {
             const popular = await Activity.aggregate([
                 { $unwind: "$events" },
@@ -268,7 +267,9 @@ export default class ActivityService {
                 { $limit: 5 },
                 { $replaceRoot: { newRoot: { $mergeObjects: ["$activity", { events: "$events" }] } } }, // Merge event and activity
             ]).exec();
-            return popular;
+            let result = popular.map(activity => { activity.events = activity.events.filter((event: Event) => event.date >= new Date() && event.state !== "cancelled" && (event.bookedSeats === undefined || event.seats > event.bookedSeats)); return activity; });
+            result = result.filter((activity: ActivityDoc) => activity.events.length > 0);
+            return result;
         } catch (error) {
             throw {
                 status: error.status || 500,

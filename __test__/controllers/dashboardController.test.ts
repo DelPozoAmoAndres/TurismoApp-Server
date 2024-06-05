@@ -21,42 +21,42 @@ describe('GET /totalReservations', () => {
         jest.clearAllMocks()
     });
 
-    describe('when getTotalReservations is called', () => {
+    describe('when getConfirmedReservations is called', () => {
         const totalReservations = 5;
         beforeAll(() => {
-            mockedDashboardService.prototype.getTotalReservations = jest.fn().mockResolvedValue(totalReservations)
+            mockedDashboardService.prototype.getConfirmedReservations = jest.fn().mockResolvedValue(totalReservations)
         });
 
         test('should return 200 and the total reservations', async () => {
             const response = await request(app)
-            .get(url)
-            .set('Origin', 'http://localhost:3000');
+                .get(url)
+                .set('Origin', 'http://localhost:3000');
 
             expect(response.status).toBe(200);
             expect(response.body).toBe(totalReservations);
         });
     });
 
-    describe('when getTotalReservations throws an default error', () => {
+    describe('when getConfirmedReservations throws an default error', () => {
 
         beforeAll(() => {
-            mockedDashboardService.prototype.getTotalReservations = jest.fn().mockRejectedValue(new Error())
+            mockedDashboardService.prototype.getConfirmedReservations = jest.fn().mockRejectedValue(new Error())
         });
 
         test('should return 500 and an error message', async () => {
             const response = await request(app)
-            .get(url)
-            .set('Origin', 'http://localhost:3000');
+                .get(url)
+                .set('Origin', 'http://localhost:3000');
 
             expect(response.status).toBe(500);
         });
     });
 
-    describe('when getTotalReservations throws an custom error', () => {
-        const error = { status: 400, message: 'Error getting total reservations'}
-        
+    describe('when getConfirmedReservations throws an custom error', () => {
+        const error = { status: 400, message: 'Error getting total reservations' }
+
         beforeAll(() => {
-            mockedDashboardService.prototype.getTotalReservations = jest.fn().mockRejectedValue(error)
+            mockedDashboardService.prototype.getConfirmedReservations = jest.fn().mockRejectedValue(error)
         });
 
         test('should return 400 and an error message', async () => {
@@ -75,7 +75,7 @@ describe('GET /totalIncome', () => {
 
     beforeAll(() => {
         mockedTokenService.prototype.getUserId = jest.fn().mockReturnValue('1')
-    }); 
+    });
 
     afterEach(() => {
         jest.clearAllMocks()
@@ -89,8 +89,8 @@ describe('GET /totalIncome', () => {
 
         test('should return 200 and the total income', async () => {
             const response = await request(app)
-            .get(url)
-            .set('Origin', 'http://localhost:3000');
+                .get(url)
+                .set('Origin', 'http://localhost:3000');
 
             expect(response.status).toBe(200);
             expect(response.body).toBe(totalIncome);
@@ -105,24 +105,24 @@ describe('GET /totalIncome', () => {
 
         test('should return 500 and an error message', async () => {
             const response = await request(app)
-            .get(url)
-            .set('Origin', 'http://localhost:3000');
+                .get(url)
+                .set('Origin', 'http://localhost:3000');
 
             expect(response.status).toBe(500);
         });
     });
 
     describe('when getTotalIncome throws an custom error', () => {
-        const error = { status: 400, message: 'Error getting total income'}
-        
+        const error = { status: 400, message: 'Error getting total income' }
+
         beforeAll(() => {
             mockedDashboardService.prototype.getTotalIncome = jest.fn().mockRejectedValue(error)
         });
 
         test('should return 400 and an error message', async () => {
             const response = await request(app)
-            .get(url)
-            .set('Origin', 'http://localhost:3000');
+                .get(url)
+                .set('Origin', 'http://localhost:3000');
 
             expect(response.status).toBe(error.status);
             expect(response.body.message).toBe(error.message);
@@ -149,8 +149,8 @@ describe('GET /occupation', () => {
 
         test('should return 200 and the occupation', async () => {
             const response = await request(app)
-            .get(url)
-            .set('Origin', 'http://localhost:3000');
+                .get(url)
+                .set('Origin', 'http://localhost:3000');
 
             expect(response.status).toBe(200);
             expect(response.body).toBe(occupation);
@@ -165,24 +165,24 @@ describe('GET /occupation', () => {
 
         test('should return 500 and an error message', async () => {
             const response = await request(app)
-            .get(url)
-            .set('Origin', 'http://localhost:3000');
+                .get(url)
+                .set('Origin', 'http://localhost:3000');
 
             expect(response.status).toBe(500);
         });
     });
 
     describe('when getOccupation throws an custom error', () => {
-        const error = { status: 400, message: 'Error getting occupation'}
-        
+        const error = { status: 400, message: 'Error getting occupation' }
+
         beforeAll(() => {
             mockedDashboardService.prototype.getOccupation = jest.fn().mockRejectedValue(error)
         });
 
         test('should return 400 and an error message', async () => {
             const response = await request(app)
-            .get(url)
-            .set('Origin', 'http://localhost:3000');
+                .get(url)
+                .set('Origin', 'http://localhost:3000');
 
             expect(response.status).toBe(error.status);
             expect(response.body.message).toBe(error.message);
@@ -209,8 +209,8 @@ describe('GET /totalUsers', () => {
 
         test('should return 200 and the total users', async () => {
             const response = await request(app)
-            .get(url)
-            .set('Origin', 'http://localhost:3000');
+                .get(url)
+                .set('Origin', 'http://localhost:3000');
 
             expect(response.status).toBe(200);
             expect(response.body).toBe(totalUsers);
@@ -225,24 +225,24 @@ describe('GET /totalUsers', () => {
 
         test('should return 500 and an error message', async () => {
             const response = await request(app)
-            .get(url)
-            .set('Origin', 'http://localhost:3000');
+                .get(url)
+                .set('Origin', 'http://localhost:3000');
 
             expect(response.status).toBe(500);
         });
     });
 
     describe('when getTotalUsers throws an custom error', () => {
-        const error = { status: 400, message: 'Error getting total users'}
-        
+        const error = { status: 400, message: 'Error getting total users' }
+
         beforeAll(() => {
             mockedDashboardService.prototype.getTotalUsers = jest.fn().mockRejectedValue(error)
         });
 
         test('should return 400 and an error message', async () => {
             const response = await request(app)
-            .get(url)
-            .set('Origin', 'http://localhost:3000');
+                .get(url)
+                .set('Origin', 'http://localhost:3000');
 
             expect(response.status).toBe(error.status);
             expect(response.body.message).toBe(error.message);
@@ -269,8 +269,8 @@ describe('GET /cancelationRate', () => {
 
         test('should return 200 and the cancelation rate', async () => {
             const response = await request(app)
-            .get(url)
-            .set('Origin', 'http://localhost:3000');
+                .get(url)
+                .set('Origin', 'http://localhost:3000');
 
             expect(response.status).toBe(200);
             expect(response.body).toBe(cancelationRate);
@@ -285,24 +285,24 @@ describe('GET /cancelationRate', () => {
 
         test('should return 500 and an error message', async () => {
             const response = await request(app)
-            .get(url)
-            .set('Origin', 'http://localhost:3000');
+                .get(url)
+                .set('Origin', 'http://localhost:3000');
 
             expect(response.status).toBe(500);
         });
     });
 
     describe('when getCancelationRate throws an custom error', () => {
-        const error = { status: 400, message: 'Error getting cancelation rate'}
-        
+        const error = { status: 400, message: 'Error getting cancelation rate' }
+
         beforeAll(() => {
             mockedDashboardService.prototype.getCancelationRate = jest.fn().mockRejectedValue(error)
         });
 
         test('should return 400 and an error message', async () => {
             const response = await request(app)
-            .get(url)
-            .set('Origin', 'http://localhost:3000');
+                .get(url)
+                .set('Origin', 'http://localhost:3000');
 
             expect(response.status).toBe(error.status);
             expect(response.body.message).toBe(error.message);
@@ -329,8 +329,8 @@ describe('GET /categoryReservations', () => {
 
         test('should return 200 and the category reservations', async () => {
             const response = await request(app)
-            .get(url)
-            .set('Origin', 'http://localhost:3000');
+                .get(url)
+                .set('Origin', 'http://localhost:3000');
 
             expect(response.status).toBe(200);
             expect(response.body).toStrictEqual(categoryReservations);
@@ -345,24 +345,24 @@ describe('GET /categoryReservations', () => {
 
         test('should return 500 and an error message', async () => {
             const response = await request(app)
-            .get(url)
-            .set('Origin', 'http://localhost:3000');
+                .get(url)
+                .set('Origin', 'http://localhost:3000');
 
             expect(response.status).toBe(500);
         });
     });
 
     describe('when getCategoryReservations throws an custom error', () => {
-        const error = { status: 400, message: 'Error getting category reservations'}
-        
+        const error = { status: 400, message: 'Error getting category reservations' }
+
         beforeAll(() => {
             mockedDashboardService.prototype.getCategoryReservations = jest.fn().mockRejectedValue(error)
         });
 
         test('should return 400 and an error message', async () => {
             const response = await request(app)
-            .get(url)
-            .set('Origin', 'http://localhost:3000');
+                .get(url)
+                .set('Origin', 'http://localhost:3000');
 
             expect(response.status).toBe(error.status);
             expect(response.body.message).toBe(error.message);
@@ -388,10 +388,10 @@ describe('GET /resume', () => {
             "occupationData": 50,
             "totalUsers": 10,
             "cancelationData": 20,
-            "categoryReservations" : [{ category: 'category', total: 5 }]
+            "categoryReservations": [{ category: 'category', total: 5 }]
         };
         beforeAll(() => {
-            mockedDashboardService.prototype.getTotalReservations = jest.fn().mockResolvedValue(resume.totalReservations)
+            mockedDashboardService.prototype.getConfirmedReservations = jest.fn().mockResolvedValue(resume.totalReservations)
             mockedDashboardService.prototype.getTotalIncome = jest.fn().mockResolvedValue(resume.totalIncome)
             mockedDashboardService.prototype.getOccupation = jest.fn().mockResolvedValue(resume.occupationData)
             mockedDashboardService.prototype.getTotalUsers = jest.fn().mockResolvedValue(resume.totalUsers)
@@ -401,8 +401,8 @@ describe('GET /resume', () => {
 
         test('should return 200 and the resume', async () => {
             const response = await request(app)
-            .get(url)
-            .set('Origin', 'http://localhost:3000');
+                .get(url)
+                .set('Origin', 'http://localhost:3000');
 
             expect(response.status).toBe(200);
             expect(response.body).toStrictEqual(resume);
@@ -412,29 +412,29 @@ describe('GET /resume', () => {
     describe('when getResume throws an default error', () => {
 
         beforeAll(() => {
-            mockedDashboardService.prototype.getTotalReservations = jest.fn().mockRejectedValue(new Error())
+            mockedDashboardService.prototype.getConfirmedReservations = jest.fn().mockRejectedValue(new Error())
         });
 
         test('should return 500 and an error message', async () => {
             const response = await request(app)
-            .get(url)
-            .set('Origin', 'http://localhost:3000');
+                .get(url)
+                .set('Origin', 'http://localhost:3000');
 
             expect(response.status).toBe(500);
         });
     });
 
     describe('when getResume throws an custom error', () => {
-        const error = { status: 400, message: 'Error getting resume'}
-        
+        const error = { status: 400, message: 'Error getting resume' }
+
         beforeAll(() => {
-            mockedDashboardService.prototype.getTotalReservations = jest.fn().mockRejectedValue(error)
+            mockedDashboardService.prototype.getConfirmedReservations = jest.fn().mockRejectedValue(error)
         });
 
         test('should return 400 and an error message', async () => {
             const response = await request(app)
-            .get(url)
-            .set('Origin', 'http://localhost:3000');
+                .get(url)
+                .set('Origin', 'http://localhost:3000');
 
             expect(response.status).toBe(error.status);
             expect(response.body.message).toBe(error.message);
@@ -442,7 +442,7 @@ describe('GET /resume', () => {
     });
 });
 
-describe ('GET /reservations', () => {
+describe('GET /reservations', () => {
     const url = baseUrl + '/reservations';
 
     beforeAll(() => {
@@ -451,7 +451,7 @@ describe ('GET /reservations', () => {
 
     afterEach(() => {
         jest.clearAllMocks()
-    }); 
+    });
 
     describe('when getReservations is called', () => {
         const reservations = [{ id: 1, date: '2021-10-10', total: 50 }];
@@ -470,23 +470,23 @@ describe ('GET /reservations', () => {
     });
 
     describe('when getReservations throws an default error', () => {
-            
-            beforeAll(() => {
-                mockedDashboardService.prototype.getReservations = jest.fn().mockRejectedValue(new Error())
-            });
-    
-            test('should return 500 and an error message', async () => {
-                const response = await request(app)
-                    .get(url)
-                    .set('Origin', 'http://localhost:3000');
-    
-                expect(response.status).toBe(500);
-            });
+
+        beforeAll(() => {
+            mockedDashboardService.prototype.getReservations = jest.fn().mockRejectedValue(new Error())
+        });
+
+        test('should return 500 and an error message', async () => {
+            const response = await request(app)
+                .get(url)
+                .set('Origin', 'http://localhost:3000');
+
+            expect(response.status).toBe(500);
+        });
     });
 
     describe('when getReservations throws an custom error', () => {
-        const error = { status: 400, message: 'Error getting reservations'}
-        
+        const error = { status: 400, message: 'Error getting reservations' }
+
         beforeAll(() => {
             mockedDashboardService.prototype.getReservations = jest.fn().mockRejectedValue(error)
         });
