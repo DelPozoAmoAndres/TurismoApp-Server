@@ -24,6 +24,7 @@ import dashboard from '@routes/dashboardRoutes';
 import { Role } from '@customTypes/user';
 
 import swagger from './swagger.json'
+import { logger } from '@utils/logger';
 
 const app = express();
 
@@ -51,6 +52,15 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 app.get('/', (req, res) => {
     res.send('Connected to the server');
+});
+
+// Middleware para manejo de errores
+process.on('uncaughtException', (err) => {
+    logger.error('Uncaught Exception:', err);
+});
+
+process.on('unhandledRejection', (reason, promise) => {
+    logger.error('Unhandled Rejection:', reason);
 });
 
 // Rutas
