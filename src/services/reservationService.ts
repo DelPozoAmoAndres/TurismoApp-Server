@@ -125,16 +125,7 @@ export default class ReservationService {
                     message: 'La reserva ya ha sido cancelada.'
                 };
 
-            const activity = await Activity.findOne({ "events._id": reservation.eventId, "events.$": 1 });
-            if (!activity)
-                throw {
-                    status: 404,
-                    message: 'La actividad no existe.'
-                };
-            const date = activity.events[0].date
-            const refund = (date.getTime() - Number(Date.now)) > 24 * 60 * 60 * 1000
-
-            await this.paymentService.cancelPayment(reservation.paymentId, refund)
+            await this.paymentService.cancelPayment(reservation.paymentId, true)
             await user.save();
         } catch (error) {
             throw {
