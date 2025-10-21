@@ -43,8 +43,6 @@ const allowedOriginFunc = (origin: string | undefined, callback: (err: Error | n
     }
 };
 
-app.use(cors());
-
 //Swagger
 const swaggerUi = require('swagger-ui-express');
 const swaggerDocument = swagger;
