@@ -34,7 +34,7 @@ app.use(loggerMiddleware);
 app.use(bodyParser.json({ limit: '100mb' }));
 app.use(bodyParser.urlencoded({ limit: '100mb', extended: true }));
 
-const allowedOrigins = ['https://astour.pozito.dev'];
+const allowedOrigins = ['https://astour.pozito.dev/'];
 const allowedOriginFunc = (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) => {
     if (origin && (origin.startsWith('http://localhost:') || origin.startsWith('http://192.168.') || allowedOrigins.includes(origin))) {
         callback(null, true);
