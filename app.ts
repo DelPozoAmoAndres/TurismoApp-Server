@@ -76,10 +76,6 @@ app.use('/api/dashboard', authMiddleware(Role.administrador), dashboard);
 
 export const server = http.createServer(app);
 export const socket = new Server(server, {
-    cors: {
-        origin: allowedOriginFunc,
-        methods: ["GET", "POST", "DELETE", "PUT"],
-    },
     allowEIO3: true
 });
 
